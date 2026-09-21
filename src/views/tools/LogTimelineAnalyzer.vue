@@ -112,40 +112,53 @@
       v-if="messageBlockContextMenu.visible"
       class="log-block-context-menu"
       :style="{ left: messageBlockContextMenu.left + 'px', top: messageBlockContextMenu.top + 'px' }"
+      role="menu"
+      aria-label="消息块操作"
       @click.stop
       @contextmenu.prevent.stop
     >
+      <div class="log-block-context-menu__header">
+        <span>行 {{ messageBlockContextMenu.block?.startLine }}-{{ messageBlockContextMenu.block?.endLine }}</span>
+        <strong>消息块操作</strong>
+      </div>
       <button
         class="log-block-context-menu__item"
         type="button"
+        role="menuitem"
         :disabled="!messageBlockContextMenu.selectedText"
         @click="copyContextMenuSelectedText"
       >
-        复制选中内容
+        <el-icon><CopyDocument /></el-icon><span>复制选中内容</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" @click="copyContextMenuMessageBlock">
-        复制消息块
+      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="copyContextMenuMessageBlock">
+        <el-icon><DocumentCopy /></el-icon><span>复制消息块</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" @click="copyContextMenuFormattedMessageBlock">
-        复制格式化消息块
+      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="copyContextMenuFormattedMessageBlock">
+        <el-icon><DocumentCopy /></el-icon><span>复制格式化消息块</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" @click="sendContextMenuMessageBlockToSecsSmlFormatter">
-        发送至SML格式化
+      <div class="log-block-context-menu__separator"></div>
+      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="sendContextMenuMessageBlockToSecsSmlFormatter">
+        <el-icon><DocumentCopy /></el-icon><span>发送至SML格式化</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" @click="markContextMenuBlockAsRangeStart">
-        标记区间起始点
+      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="sendContextMenuMessageBlockToSmlBuilder">
+        <el-icon><SetUp /></el-icon><span>发送至SECS SML构造器</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" @click="markContextMenuBlockAsRangeEnd">
-        标记区间结束点
+      <div class="log-block-context-menu__separator"></div>
+      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="markContextMenuBlockAsRangeStart">
+        <el-icon><Top /></el-icon><span>标记区间起始点</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" :disabled="!hasMarkedRangePoint" @click="clearRangeMarkers(true)">
-        清除区间标记
+      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="markContextMenuBlockAsRangeEnd">
+        <el-icon><Bottom /></el-icon><span>标记区间结束点</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" @click="recordContextMenuMessageBlockToDiff('left')">
-        记录至Diff-L
+      <button class="log-block-context-menu__item log-block-context-menu__item--danger" type="button" role="menuitem" :disabled="!hasMarkedRangePoint" @click="clearRangeMarkers(true)">
+        <el-icon><Delete /></el-icon><span>清除区间标记</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" @click="recordContextMenuMessageBlockToDiff('right')">
-        记录至Diff-R
+      <div class="log-block-context-menu__separator"></div>
+      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="recordContextMenuMessageBlockToDiff('left')">
+        <el-icon><DArrowLeft /></el-icon><span>记录至Diff-L</span>
+      </button>
+      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="recordContextMenuMessageBlockToDiff('right')">
+        <el-icon><DArrowRight /></el-icon><span>记录至Diff-R</span>
       </button>
     </div>
 
@@ -204,7 +217,7 @@
 import { ref, shallowRef, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Download } from '@element-plus/icons-vue'
+import { Bottom, CopyDocument, DArrowLeft, DArrowRight, Delete, DocumentCopy, Download, SetUp, Top } from '@element-plus/icons-vue'
 import { EditorView, lineNumbers, Decoration } from '@codemirror/view'
 import { Compartment, EditorState, Range, Text } from '@codemirror/state'
 import JSZip from 'jszip'
@@ -955,8 +968,8 @@ const closeMessageBlockContextMenu = () => {
 }
 
 const getContextMenuPosition = (event: MouseEvent) => {
-  const menuWidth = 148
-  const menuHeight = 316
+  const menuWidth = 216
+  const menuHeight = 374
   const margin = 8
 
   return {
@@ -1116,6 +1129,42 @@ const sendContextMenuMessageBlockToSecsSmlFormatter = () => {
     }
 
     ElMessage.success('已发送至 SECS SML 格式化')
+  } catch {
+    ElMessage.error('发送失败，请稍后重试')
+  } finally {
+    closeMessageBlockContextMenu()
+  }
+}
+
+const sendContextMenuMessageBlockToSmlBuilder = () => {
+  const block = messageBlockContextMenu.value.block
+  if (!block) {
+    closeMessageBlockContextMenu()
+    return
+  }
+
+  const text = getMessageBlockText(block)
+  if (!text) {
+    closeMessageBlockContextMenu()
+    ElMessage.warning('当前消息块为空，无法发送')
+    return
+  }
+
+  try {
+    const transferId = storeSecsSmlTransferText(text)
+    const route = router.resolve({
+      path: '/tools/sml-builder',
+      query: { source: transferId }
+    })
+    const openedWindow = window.open(route.href, '_blank')
+
+    if (!openedWindow) {
+      discardSecsSmlTransferText(transferId)
+      ElMessage.error('打开 SECS SML构造器页面失败，请检查浏览器弹窗设置')
+      return
+    }
+
+    ElMessage.success('已发送至 SECS SML构造器')
   } catch {
     ElMessage.error('发送失败，请稍后重试')
   } finally {
@@ -2210,43 +2259,77 @@ const flashMessageBlockByLine = (lineNumber: number) => {
 .log-block-context-menu {
   position: fixed;
   z-index: 3000;
-  min-width: 128px;
-  padding: 4px;
-  border: 1px solid #dbe3ef;
-  border-radius: 6px;
+  width: 216px;
+  padding: 5px;
+  border: 1px solid #d4dee8;
+  border-radius: 7px;
   background: #ffffff;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 12px 30px rgb(15 23 42 / 0.17), 0 2px 6px rgb(15 23 42 / 0.08);
+  color: #334155;
+}
+
+.log-block-context-menu__header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 7px 7px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.log-block-context-menu__header span {
+  flex: 0 0 auto;
+  color: #8290a2;
+  font: 8px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.log-block-context-menu__header strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #465569;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .log-block-context-menu__item {
-  display: block;
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  gap: 6px;
   width: 100%;
-  padding: 7px 10px;
+  height: 29px;
+  padding: 0 7px;
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: #334155;
-  font-size: 13px;
-  line-height: 18px;
+  color: #465569;
+  font-size: 10px;
   text-align: left;
   cursor: pointer;
 }
 
 .log-block-context-menu__item:hover,
 .log-block-context-menu__item:focus-visible {
-  background: #eef6ff;
-  color: #0369a1;
+  background: #edf7f7;
+  color: #096f78;
   outline: none;
 }
 
+.log-block-context-menu__item .el-icon { font-size: 13px; }
+
 .log-block-context-menu__item:disabled {
-  color: #94a3b8;
+  color: #b6c0cc;
   cursor: not-allowed;
 }
 
 .log-block-context-menu__item:disabled:hover,
 .log-block-context-menu__item:disabled:focus-visible {
   background: transparent;
-  color: #94a3b8;
+  color: #b6c0cc;
 }
+
+.log-block-context-menu__item--danger { color: #b23842; }
+.log-block-context-menu__item--danger:hover:not(:disabled) { background: #fff1f2; color: #b4232d; }
+.log-block-context-menu__separator { height: 1px; margin: 4px 5px; background: #edf1f5; }
 </style>

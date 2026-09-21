@@ -127,6 +127,18 @@ describe('SECS SML parser', () => {
     expect(result.text).toBe(`S1F1\n<A [5] "OK   ">.`)
   })
 
+  it('can remove character-length indicators from formatted output', () => {
+    const result = formatSecsSml(`S1F1\n<L [2]\n  <A [6] "RTSLCT">\n  <JIS8 [2] 'OK'>\n>.`, {
+      removeLengthIndicators: true
+    })
+
+    expect(result.diagnostics).toEqual([])
+    expect(result.text).toContain('<A "RTSLCT">')
+    expect(result.text).toContain("<JIS8 'OK'>")
+    expect(result.text).not.toContain('[6]')
+    expect(result.text).not.toContain('[2]')
+  })
+
   it('supports bracket counts, brace labels, long type names, comments and semicolon terminators', () => {
     const source = `S01F012 W
 <LIST [2] {SV_LIST}

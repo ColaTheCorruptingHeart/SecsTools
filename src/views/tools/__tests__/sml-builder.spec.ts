@@ -53,15 +53,24 @@ describe('SML builder', () => {
   })
 
   it('uses the shared SML formatter for clipboard output', () => {
-    const formatted = formatSmlDraftForCopy(createS2F41Draft(), {
+    const draft = createS2F41Draft()
+    draft.root.children[0]!.declaredLength = 8
+    const formatted = formatSmlDraftForCopy(draft, {
       numericQuote: 'double',
       textQuote: 'single'
     })
+    const withoutLengths = formatSmlDraftForCopy(draft, {
+      numericQuote: 'double',
+      textQuote: 'single'
+    }, true)
 
     expect(formatted.diagnostics).toEqual([])
     expect(formatted.text).toContain("    <A 'START'>")
     expect(formatted.text).toContain('            <U1 "1">')
     expect(formatted.text).not.toContain('<L [')
+    expect(formatted.text).toContain("<A [8] 'START   '>")
+    expect(withoutLengths.text).toContain("<A 'START   '>")
+    expect(withoutLengths.text).not.toContain('[8]')
   })
 
   it('validates typed parameter values and duplicate names', () => {

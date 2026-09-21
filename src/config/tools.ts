@@ -67,7 +67,7 @@ export const toolsConfig: ToolCategory[] = [
     tools: [
       {
         id: 'sml-builder',
-        name: 'SML 构造器',
+        name: 'SECS SML构造器',
         desc: '通过参数表和结构树创建复杂 SML，自动维护 List 数量并实时校验。',
         path: '/tools/sml-builder',
         icon: 'SetUp',

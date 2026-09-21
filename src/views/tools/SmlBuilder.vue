@@ -5,7 +5,7 @@
         <div class="editor-brand">
           <div class="editor-brand__icon"><el-icon><SetUp /></el-icon></div>
           <div>
-            <h2 id="sml-builder-title">SML 构造器</h2>
+            <h2 id="sml-builder-title">SECS SML构造器</h2>
             <small>直接编辑节点、类型与层级</small>
           </div>
         </div>
@@ -231,13 +231,16 @@
 
         <aside class="source-panel overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-label="SML 源码">
           <header>
-            <div>
+            <div class="source-title">
               <span>SOURCE</span>
               <strong>SML 源码</strong>
             </div>
-            <span class="source-status" :class="`source-status--${sourceSyncState}`">
-              <i></i>{{ sourceStatusText }}
-            </span>
+            <div class="source-header-actions">
+              <el-checkbox v-model="showLengthIndicators" size="small" data-testid="source-show-length-indicators">显示长度标识</el-checkbox>
+              <span class="source-status" :class="`source-status--${sourceSyncState}`">
+                <i></i>{{ sourceStatusText }}
+              </span>
+            </div>
           </header>
 
           <div class="source-editor">
@@ -391,7 +394,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   ArrowDown,
@@ -414,6 +418,7 @@ import {
   WarningFilled
 } from '@element-plus/icons-vue'
 import { formatSmlDiagnostic, parseSmlTree, type SecsSmlNode } from './secsSml'
+import { consumeSecsSmlTransferText } from './secsSmlTransfer'
 import {
   DEFAULT_SML_QUOTE_SETTINGS,
   SML_VALUE_TYPES,
@@ -469,6 +474,7 @@ function loadQuoteSettings(): SmlQuoteSettings {
 }
 
 const templateMode = ref<TemplateMode>('s2f41')
+const route = useRoute()
 const pageRoot = ref<HTMLDivElement | null>(null)
 const draft = reactive<SmlMessageDraft>(createS2F41Draft())
 const selectedNodeId = ref(draft.root.children[0]?.id || draft.root.id)
@@ -483,7 +489,8 @@ const selectedPath = computed(() => getNodePath(draft.root, selectedNode.value.i
 const isRootSelected = computed(() => selectedNode.value.id === draft.root.id)
 const nodeCount = computed(() => countNodes(draft.root))
 const smlText = computed(() => serializeSmlDraft(draft, quoteSettings))
-const formattedSmlText = computed(() => formatSmlDraftForCopy(draft, quoteSettings).text)
+const showLengthIndicators = ref(false)
+const formattedSmlText = computed(() => formatSmlDraftForCopy(draft, quoteSettings, !showLengthIndicators.value).text)
 const sourceText = ref(formattedSmlText.value)
 const sourceSyncState = ref<SourceSyncState>('synced')
 const sourceSyncMessage = ref('')
@@ -888,7 +895,7 @@ function inferS2F41Labels(root: SmlBuilderNode) {
   })
 }
 
-function applySourceSml() {
+function applySourceSml(): boolean {
   const parsed = parseSmlTree(sourceText.value, { mode: 'strict' })
   const errors = parsed.diagnostics.filter(item => item.severity === 'error')
   if (!parsed.roots[0] || parsed.roots.length !== 1 || errors.length) {
@@ -898,7 +905,7 @@ function applySourceSml() {
       : parsed.roots.length > 1
         ? '当前构造器一次只能编辑一个 SML 根节点'
         : '没有找到可应用的 SML 根节点'
-    return
+    return false
   }
   const headerMatch = parsed.header.match(/^S(\d+)F(\d+)(?:\s+(W))?$/i)
   const nextDraft: SmlMessageDraft = {
@@ -911,9 +918,39 @@ function applySourceSml() {
   templateMode.value = isS2F41 ? 's2f41' : 'blank'
   if (isS2F41) inferS2F41Labels(nextDraft.root)
   replaceDraft(nextDraft)
-  sourceText.value = formatSmlDraftForCopy(nextDraft, quoteSettings).text
+  sourceText.value = formatSmlDraftForCopy(nextDraft, quoteSettings, !showLengthIndicators.value).text
   sourceSyncState.value = 'synced'
   sourceSyncMessage.value = ''
+  return true
+}
+
+function removeTransferQueryFromUrl() {
+  const url = new URL(window.location.href)
+  url.searchParams.delete('source')
+  window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
+}
+
+async function loadTransferredSourceText() {
+  const sourceQuery = route.query.source
+  const transferId = Array.isArray(sourceQuery) ? sourceQuery[0] : sourceQuery
+  if (!transferId) return
+
+  removeTransferQueryFromUrl()
+  const transferredText = consumeSecsSmlTransferText(transferId)
+  if (!transferredText) {
+    ElMessage.warning('未找到待构造的消息块内容')
+    return
+  }
+
+  sourceText.value = transferredText
+  sourceSyncState.value = 'editing'
+  sourceSyncMessage.value = ''
+  await nextTick()
+  const imported = applySourceSml()
+
+  if (imported) {
+    ElMessage.success('消息块已导入 SECS SML构造器')
+  }
 }
 
 function handleSourceInput(value: string) {
@@ -974,6 +1011,7 @@ onMounted(() => {
   window.addEventListener('click', closeContextMenu)
   window.addEventListener('keydown', handleWindowKeydown, true)
   window.addEventListener('scroll', closeContextMenu, true)
+  void loadTransferredSourceText()
 })
 
 onUnmounted(() => {
@@ -1096,9 +1134,11 @@ onUnmounted(() => {
 .source-panel,
 .diagnostics-panel { min-width: 0; display: flex; flex-direction: column; background: #fff; }
 .source-panel header { min-height: 49px; justify-content: space-between; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--line); background: #f8fafc; }
-.source-panel header > div { display: flex; flex-direction: column; gap: 1px; }
-.source-panel header div span { color: #8b99ab; font: 8px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.08em; }
-.source-panel header strong { color: #475569; font-size: 12px; }
+.source-panel header > .source-title { display: flex; flex-direction: column; gap: 1px; }
+.source-panel header .source-title span { color: #8b99ab; font: 8px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.08em; }
+.source-panel header .source-title strong { color: #475569; font-size: 12px; }
+.source-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.source-header-actions :deep(.el-checkbox) { height: auto; margin: 0; --el-checkbox-font-size: 9px; --el-checkbox-text-color: #64748b; }
 .source-status { display: inline-flex; align-items: center; gap: 5px; color: #64748b; font-size: 9px; white-space: nowrap; }
 .source-status i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .source-status--synced { color: #168066; }

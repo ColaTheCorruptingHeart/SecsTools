@@ -13,6 +13,11 @@
               :disabled="loading"
               data-testid="parse-mode"
             />
+            <el-checkbox
+              v-model="showLengthIndicators"
+              :disabled="loading"
+              data-testid="show-length-indicators"
+            >显示长度标识</el-checkbox>
             <el-button size="small" type="primary" class="!rounded-md shadow-sm" :loading="loading" :disabled="loading" @click="onFormat">格式化</el-button>
             <el-button size="small" type="danger" plain class="!rounded-md" :disabled="loading" @click="onClear">清空</el-button>
           </div>
@@ -36,6 +41,7 @@
             <span v-if="selectedPath" class="text-xs text-slate-400 font-mono max-w-[200px] truncate" :title="selectedPath">
               {{ '当前位置：' + selectedPath }}
             </span>
+            <el-button size="small" class="!rounded-md" :icon="SetUp" :disabled="loading || !formattedText" @click="sendFormattedResultToSmlBuilder">发送至SML构造器</el-button>
             <el-button size="small" class="!rounded-md" :disabled="loading || !formattedText" @click="onCopy">复制结果</el-button>
             <div class="flex items-center">
               <el-input
@@ -127,12 +133,12 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, shallowRef } from 'vue'
 import { Codemirror } from 'vue-codemirror'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowDown, ArrowUp, CircleCloseFilled, WarningFilled } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowUp, CircleCloseFilled, SetUp, WarningFilled } from '@element-plus/icons-vue'
 import { Compartment, EditorState } from '@codemirror/state'
 import { Decoration, EditorView, lineNumbers } from '@codemirror/view'
-import { consumeSecsSmlTransferText } from './secsSmlTransfer'
+import { consumeSecsSmlTransferText, discardSecsSmlTransferText, storeSecsSmlTransferText } from './secsSmlTransfer'
 import type { SmlDiagnostic, SmlParseMode } from './secsSml'
 
 interface FormattedLineMeta {
@@ -148,6 +154,7 @@ type FormatWorkerMessage =
 
 const sourceTextareaRef = ref<HTMLTextAreaElement | null>(null)
 const route = useRoute()
+const router = useRouter()
 const formattedText = ref('')
 const formattedLines = ref<string[]>([])
 const visibleFormattedText = ref('')
@@ -161,6 +168,7 @@ const parseModeOptions = [
   { label: '宽松', value: 'lenient' },
   { label: '严格', value: 'strict' }
 ]
+const showLengthIndicators = ref(false)
 const diagnostics = ref<SmlDiagnostic[]>([])
 const diagnosticsOpen = ref(true)
 const selectedDiagnosticIndex = ref(-1)
@@ -510,7 +518,7 @@ const formattedTextModel = computed({
   set: () => {}
 })
 
-function runFormatWorker(text: string, mode: SmlParseMode) {
+function runFormatWorker(text: string, mode: SmlParseMode, removeLengthIndicators: boolean) {
   return new Promise<{ text: string; lineMeta: FormattedLineMeta[]; diagnostics: SmlDiagnostic[] }>((resolve, reject) => {
     const worker = new Worker(new URL('./secsSmlFormatter.worker.ts', import.meta.url), { type: 'module' })
 
@@ -536,7 +544,7 @@ function runFormatWorker(text: string, mode: SmlParseMode) {
       reject(new Error(event.message || '格式化失败，请检查报文内容'))
     }
 
-    worker.postMessage({ text, mode })
+    worker.postMessage({ text, mode, removeLengthIndicators })
   })
 }
 
@@ -571,7 +579,7 @@ async function onFormat() {
 
   try {
     await nextTick()
-    const result = await runFormatWorker(sourceText, parseMode.value)
+    const result = await runFormatWorker(sourceText, parseMode.value, !showLengthIndicators.value)
     formattedText.value = result.text
     formattedLines.value = result.text ? result.text.split('\n') : []
     formattedLineMeta.value = result.lineMeta
@@ -710,6 +718,32 @@ async function onCopy() {
     ElMessage.success('已复制结果')
   } catch {
     ElMessage.error('复制失败，请手动复制')
+  }
+}
+
+function sendFormattedResultToSmlBuilder() {
+  if (!formattedText.value) {
+    ElMessage.warning('请先执行格式化')
+    return
+  }
+
+  try {
+    const transferId = storeSecsSmlTransferText(formattedText.value)
+    const route = router.resolve({
+      path: '/tools/sml-builder',
+      query: { source: transferId }
+    })
+    const openedWindow = window.open(route.href, '_blank')
+
+    if (!openedWindow) {
+      discardSecsSmlTransferText(transferId)
+      ElMessage.error('打开 SECS SML构造器页面失败，请检查浏览器弹窗设置')
+      return
+    }
+
+    ElMessage.success('已发送至 SECS SML构造器')
+  } catch {
+    ElMessage.error('发送失败，请稍后重试')
   }
 }
 

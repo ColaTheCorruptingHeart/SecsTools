@@ -16,13 +16,17 @@ type WorkerResponse =
 interface WorkerRequest {
   text: string
   mode: SmlParseMode
+  removeLengthIndicators: boolean
 }
 
 const workerScope = self as DedicatedWorkerGlobalScope
 
 workerScope.onmessage = (event: MessageEvent<WorkerRequest>) => {
   try {
-    const result = formatSecsSml(event.data.text, { mode: event.data.mode })
+    const result = formatSecsSml(event.data.text, {
+      mode: event.data.mode,
+      removeLengthIndicators: event.data.removeLengthIndicators
+    })
     const lineMeta = result.lines.map(line => ({
       clickable: line.clickable,
       path: line.path,

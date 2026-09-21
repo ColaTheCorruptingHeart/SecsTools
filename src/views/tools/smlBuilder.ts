@@ -195,9 +195,10 @@ export function serializeSmlDraft(
 
 export function formatSmlDraftForCopy(
   draft: SmlMessageDraft,
-  settings: SmlQuoteSettings = DEFAULT_SML_QUOTE_SETTINGS
+  settings: SmlQuoteSettings = DEFAULT_SML_QUOTE_SETTINGS,
+  removeLengthIndicators = false
 ) {
-  return formatSecsSml(serializeSmlDraft(draft, settings), { mode: 'strict' })
+  return formatSecsSml(serializeSmlDraft(draft, settings), { mode: 'strict', removeLengthIndicators })
 }
 
 export function countNodes(root: SmlBuilderNode): number {

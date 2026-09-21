@@ -14,6 +14,8 @@ export type SmlDiagnosticCode =
 
 export interface SmlParseOptions {
   mode?: SmlParseMode
+  /** Hides scalar character-length markers in formatted output without changing parsed data. */
+  removeLengthIndicators?: boolean
   additionalTypes?: readonly string[]
   maxDepth?: number
   maxNodes?: number
@@ -538,7 +540,15 @@ export function pathToString(path: number[]) {
   return path.map(value => `[${value}]`).join('')
 }
 
-export function buildFormattedResult(parsed: ParsedSecsSmlTree) {
+function formatNodeText(node: SecsSmlNode, removeLengthIndicators: boolean) {
+  if (!removeLengthIndicators || node.declaredCount === undefined || !isCharacterType(node.typeName || '')) {
+    return node.text
+  }
+
+  return node.text.replace(/^(<[A-Za-z][A-Za-z0-9]*)\s+\[\d+\](?=\s|>)/, '$1')
+}
+
+export function buildFormattedResult(parsed: ParsedSecsSmlTree, options: Pick<SmlParseOptions, 'removeLengthIndicators'> = {}) {
   const lines: FormattedSecsSmlLine[] = []
   if (parsed.header) lines.push({ text: parsed.header, clickable: false, path: '' })
 
@@ -546,7 +556,7 @@ export function buildFormattedResult(parsed: ParsedSecsSmlTree) {
     const openLineIndex = lines.length
     const isLeaf = !node.children.length && node.text.endsWith('>')
     lines.push({
-      text: `${'    '.repeat(depth)}${node.text}${depth === 0 && isLastRoot && isLeaf ? (parsed.terminal || '') : ''}`,
+      text: `${'    '.repeat(depth)}${formatNodeText(node, Boolean(options.removeLengthIndicators))}${depth === 0 && isLastRoot && isLeaf ? (parsed.terminal || '') : ''}`,
       clickable: true,
       path: pathToString(path),
       jumpToIndex: openLineIndex
@@ -571,7 +581,7 @@ export function buildFormattedResult(parsed: ParsedSecsSmlTree) {
 
 export function formatSecsSml(rawText: string, options: SmlParseOptions = {}): FormattedSecsSmlResult {
   const parsed = parseSmlTree(rawText, options)
-  const lines = buildFormattedResult(parsed)
+  const lines = buildFormattedResult(parsed, options)
   return {
     lines,
     text: lines.map(line => line.text).join('\n'),
