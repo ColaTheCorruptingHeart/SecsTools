@@ -8,8 +8,18 @@ import {
   serializeSmlDraft,
   validateSmlDraft
 } from '../smlBuilder'
+import { GEM_SML_TEMPLATES } from '../gemSmlTemplates'
+import { parseSmlTree } from '../secsSml'
 
 describe('SML builder', () => {
+  it('keeps every data-bearing GEM template strictly parseable', () => {
+    GEM_SML_TEMPLATES.filter(template => template.source.includes('<')).forEach(template => {
+      const parsed = parseSmlTree(template.source, { mode: 'strict' })
+      expect(parsed.diagnostics).toEqual([])
+      expect(parsed.roots).toHaveLength(1)
+    })
+  })
+
   it('serializes the S2F41 template with calculated list counts', () => {
     const draft = createS2F41Draft()
     const parameters = draft.root.children[1]!

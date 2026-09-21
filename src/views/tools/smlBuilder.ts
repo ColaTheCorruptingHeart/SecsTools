@@ -23,6 +23,7 @@ export interface SmlMessageDraft {
   stream: number
   function: number
   wait: boolean
+  hasBody: boolean
   root: SmlBuilderNode
 }
 
@@ -70,6 +71,7 @@ export function createS2F41Draft(): SmlMessageDraft {
     stream: 2,
     function: 41,
     wait: true,
+    hasBody: true,
     root: createNode('L', 'S2F41 Body', '', [
       createNode('A', 'RCMD', 'START'),
       createNode('L', 'Command Parameters', '', [
@@ -86,7 +88,18 @@ export function createBlankDraft(): SmlMessageDraft {
     stream: 1,
     function: 1,
     wait: true,
+    hasBody: true,
     root: createNode('L', 'Message Body')
+  }
+}
+
+export function createHeaderOnlyDraft(stream: number, functionNumber: number, wait: boolean): SmlMessageDraft {
+  return {
+    stream,
+    function: functionNumber,
+    wait,
+    hasBody: false,
+    root: createNode('L', 'No data body')
   }
 }
 
@@ -146,6 +159,11 @@ export function buildPreviewLines(
     text: `S${draft.stream}F${draft.function}${draft.wait ? ' W' : ''}`,
     kind: 'header'
   }]
+
+  if (!draft.hasBody) {
+    lines.push({ key: 'terminal', depth: 0, text: '.', kind: 'close' })
+    return lines
+  }
 
   function walk(node: SmlBuilderNode, depth: number, isRoot = false) {
     if (node.type !== 'L') {

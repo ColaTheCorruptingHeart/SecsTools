@@ -141,7 +141,7 @@
         <el-icon><DocumentCopy /></el-icon><span>发送至SML格式化</span>
       </button>
       <button class="log-block-context-menu__item" type="button" role="menuitem" @click="sendContextMenuMessageBlockToSmlBuilder">
-        <el-icon><SetUp /></el-icon><span>发送至SECS SML构造器</span>
+        <el-icon><SetUp /></el-icon><span>发送至SML构造器</span>
       </button>
       <div class="log-block-context-menu__separator"></div>
       <button class="log-block-context-menu__item" type="button" role="menuitem" @click="markContextMenuBlockAsRangeStart">

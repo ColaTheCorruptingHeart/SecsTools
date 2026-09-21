@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div ref="pageRoot" class="sml-builder-page relative h-full min-h-0 flex flex-col gap-2">
     <section class="editor-shell flex-1 min-h-0 flex flex-col gap-2" aria-labelledby="sml-builder-title">
       <header class="editor-header shrink-0 rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -16,12 +16,15 @@
             <el-select
               :model-value="templateMode"
               size="small"
+              filterable
               popper-class="sml-template-select-popper"
               data-testid="template-select"
               @change="changeTemplate"
             >
-              <el-option label="S2F41 · Host Command Send" value="s2f41" />
-              <el-option label="空白报文" value="blank" />
+              <el-option label="Custom Blank Message" value="blank" />
+              <el-option-group v-for="group in gemTemplateGroups" :key="group.label" :label="group.label">
+                <el-option v-for="template in group.templates" :key="template.id" :label="template.label" :value="template.id" />
+              </el-option-group>
             </el-select>
           </label>
 
@@ -229,11 +232,11 @@
           </div>
         </div>
 
-        <aside class="source-panel overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-label="SML 源码">
+        <aside class="source-panel overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-label="标准SML">
           <header>
             <div class="source-title">
               <span>SOURCE</span>
-              <strong>SML 源码</strong>
+              <strong>标准SML</strong>
             </div>
             <div class="source-header-actions">
               <el-checkbox v-model="showLengthIndicators" size="small" data-testid="source-show-length-indicators">显示长度标识</el-checkbox>
@@ -248,7 +251,7 @@
               :model-value="sourceText"
               type="textarea"
               resize="none"
-              aria-label="SML 源码"
+              aria-label="标准SML"
               class="source-input"
               data-testid="sml-source-input"
               spellcheck="false"
@@ -419,12 +422,14 @@ import {
 } from '@element-plus/icons-vue'
 import { formatSmlDiagnostic, parseSmlTree, type SecsSmlNode } from './secsSml'
 import { consumeSecsSmlTransferText } from './secsSmlTransfer'
+import { GEM_SML_TEMPLATES } from './gemSmlTemplates'
 import {
   DEFAULT_SML_QUOTE_SETTINGS,
   SML_VALUE_TYPES,
   cloneNode,
   countNodes,
   createBlankDraft,
+  createHeaderOnlyDraft,
   createNode,
   createS2F41Draft,
   findNode,
@@ -441,7 +446,7 @@ import {
   type SmlValueType
 } from './smlBuilder'
 
-type TemplateMode = 's2f41' | 'blank'
+type TemplateMode = string
 type CanvasRowKind = 'open' | 'value' | 'close'
 type SourceSyncState = 'synced' | 'editing' | 'error'
 
@@ -473,16 +478,25 @@ function loadQuoteSettings(): SmlQuoteSettings {
   }
 }
 
-const templateMode = ref<TemplateMode>('s2f41')
+const templateMode = ref<TemplateMode>('blank')
 const route = useRoute()
 const pageRoot = ref<HTMLDivElement | null>(null)
-const draft = reactive<SmlMessageDraft>(createS2F41Draft())
+const draft = reactive<SmlMessageDraft>(createBlankDraft())
 const selectedNodeId = ref(draft.root.children[0]?.id || draft.root.id)
 const collapsedNodes = ref(new Set<string>())
 const draggedNodeId = ref('')
 const dropTargetId = ref('')
 const quoteSettings = reactive<SmlQuoteSettings>(loadQuoteSettings())
 const contextMenu = reactive({ open: false, x: 0, y: 0 })
+const gemTemplateGroups = computed(() => {
+  const groups = new Map<string, typeof GEM_SML_TEMPLATES>()
+  GEM_SML_TEMPLATES.forEach(template => {
+    const templates = groups.get(template.group) || []
+    templates.push(template)
+    groups.set(template.group, templates)
+  })
+  return Array.from(groups, ([label, templates]) => ({ label, templates }))
+})
 
 const selectedNode = computed(() => findNode(draft.root, selectedNodeId.value) || draft.root)
 const selectedPath = computed(() => getNodePath(draft.root, selectedNode.value.id))
@@ -499,7 +513,7 @@ const sourceStatusText = computed(() => {
   if (sourceSyncState.value === 'error') return '解析失败'
   return '已同步'
 })
-const issues = computed(() => validateSmlDraft(draft, templateMode.value))
+const issues = computed(() => validateSmlDraft(draft, templateMode.value === 's2f41' ? 's2f41' : 'blank'))
 const errorCount = computed(() => issues.value.filter(issue => issue.severity === 'error').length)
 const warningCount = computed(() => issues.value.filter(issue => issue.severity === 'warning').length)
 let mainContentElement: HTMLElement | null = null
@@ -508,6 +522,7 @@ let previousMainPaddingVariable = ''
 
 const canvasRows = computed<CanvasRow[]>(() => {
   const rows: CanvasRow[] = []
+  if (!draft.hasBody) return rows
   function walk(node: SmlBuilderNode, depth: number, path: number[]) {
     const pathText = path.map(index => `[${index}]`).join('')
     if (node.type === 'L') {
@@ -558,9 +573,36 @@ function replaceDraft(nextDraft: SmlMessageDraft) {
   draft.stream = nextDraft.stream
   draft.function = nextDraft.function
   draft.wait = nextDraft.wait
+  draft.hasBody = nextDraft.hasBody
   draft.root = nextDraft.root
   selectedNodeId.value = nextDraft.root.children[0]?.id || nextDraft.root.id
   collapsedNodes.value = new Set()
+}
+
+function createTemplateDraft(mode: TemplateMode): SmlMessageDraft | undefined {
+  if (mode === 's2f41') return createS2F41Draft()
+  if (mode === 'blank') return createBlankDraft()
+
+  const template = GEM_SML_TEMPLATES.find(item => item.id === mode)
+  if (!template) return undefined
+
+  const parsed = parseSmlTree(template.source, { mode: 'strict' })
+  const headerMatch = parsed.header.match(/^S(\d+)F(\d+)(?:\s+(W))?$/i)
+  if (headerMatch && !template.source.includes('<')) {
+    return createHeaderOnlyDraft(Number(headerMatch[1]), Number(headerMatch[2]), Boolean(headerMatch[3]))
+  }
+  const errors = parsed.diagnostics.filter(item => item.severity === 'error')
+  if (!headerMatch || errors.length) return undefined
+  if (!parsed.roots.length) return createHeaderOnlyDraft(Number(headerMatch[1]), Number(headerMatch[2]), Boolean(headerMatch[3]))
+  if (parsed.roots.length !== 1 || !parsed.roots[0]) return undefined
+
+  return {
+    stream: Number(headerMatch[1]),
+    function: Number(headerMatch[2]),
+    wait: Boolean(headerMatch[3]),
+    hasBody: true,
+    root: convertImportedNode(parsed.roots[0])
+  }
 }
 
 async function changeTemplate(value: unknown) {
@@ -570,8 +612,13 @@ async function changeTemplate(value: unknown) {
     await ElMessageBox.confirm('切换模板会替换当前 SML。', '切换初始模板', {
       confirmButtonText: '切换', cancelButtonText: '保留当前内容', type: 'warning'
     })
+    const nextDraft = createTemplateDraft(nextMode)
+    if (!nextDraft) {
+      ElMessage.error('标准 SML 模板解析失败')
+      return
+    }
     templateMode.value = nextMode
-    replaceDraft(nextMode === 's2f41' ? createS2F41Draft() : createBlankDraft())
+    replaceDraft(nextDraft)
   } catch {
     // Keep the current SML.
   }
@@ -582,7 +629,12 @@ async function resetDraft() {
     await ElMessageBox.confirm('重置会放弃当前修改。', '重置 SML', {
       confirmButtonText: '重置', cancelButtonText: '取消', type: 'warning'
     })
-    replaceDraft(templateMode.value === 's2f41' ? createS2F41Draft() : createBlankDraft())
+    const resetTemplate = createTemplateDraft(templateMode.value)
+    if (!resetTemplate) {
+      ElMessage.error('标准 SML 模板解析失败')
+      return
+    }
+    replaceDraft(resetTemplate)
     ElMessage.success('已重置 SML')
   } catch {
     // Keep the current SML.
@@ -896,6 +948,16 @@ function inferS2F41Labels(root: SmlBuilderNode) {
 }
 
 function applySourceSml(): boolean {
+  const headerOnlyMatch = sourceText.value.trim().match(/^S(\d+)F(\d+)(?:\s+(W))?\s*\n\.\s*$/i)
+  if (headerOnlyMatch) {
+    templateMode.value = 'blank'
+    replaceDraft(createHeaderOnlyDraft(Number(headerOnlyMatch[1]), Number(headerOnlyMatch[2]), Boolean(headerOnlyMatch[3])))
+    sourceText.value = formatSmlDraftForCopy(draft, quoteSettings, !showLengthIndicators.value).text
+    sourceSyncState.value = 'synced'
+    sourceSyncMessage.value = ''
+    return true
+  }
+
   const parsed = parseSmlTree(sourceText.value, { mode: 'strict' })
   const errors = parsed.diagnostics.filter(item => item.severity === 'error')
   if (!parsed.roots[0] || parsed.roots.length !== 1 || errors.length) {
@@ -912,6 +974,7 @@ function applySourceSml(): boolean {
     stream: headerMatch ? Number(headerMatch[1]) : draft.stream,
     function: headerMatch ? Number(headerMatch[2]) : draft.function,
     wait: Boolean(headerMatch?.[3]),
+    hasBody: true,
     root: convertImportedNode(parsed.roots[0])
   }
   const isS2F41 = nextDraft.stream === 2 && nextDraft.function === 41
@@ -1053,7 +1116,7 @@ onUnmounted(() => {
 .header-actions { flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
 .template-picker { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; white-space: nowrap; }
 .template-picker :deep(.el-select) {
-  width: 202px;
+  width: 244px;
   /* The template list is tiny. Avoid a composited transition whose presentation
      cost can be amplified dramatically by some Windows GPU/DevTools setups. */
   --el-transition-duration: 0s;
