@@ -18,6 +18,7 @@
         :sxfy-list="sxfyList"
         :predefine-colors="predefineColors"
         :has-log-content="Boolean(logContent)"
+        :export-loading="ruleExportHashing"
         @openCeidImport="importDialogVisible = true"
         @updateCeidMatchMode="updateCeidMatchMode"
         @openCustomCeid="openCustomCeidDialog"
@@ -210,6 +211,23 @@
       @deleteMachineOption="removeRangeExportMachineOption"
       @confirm="confirmMatchedExport"
     />
+
+    <ExportFileNameDialog
+      v-model="ruleExportDialogVisible"
+      title="导出规则"
+      :machine-options="rangeExportMachineOptions"
+      fallback-segment="secs-log-rules"
+      :log-date="ruleExportTimestamp"
+      :content-hash="ruleExportContentHash"
+      extension="json"
+      confirm-label="导出规则"
+      machine-only
+      machine-label="设备号"
+      machine-placeholder="可选，可输入新设备号"
+      date-label="时间戳"
+      @deleteMachineOption="removeRangeExportMachineOption"
+      @confirm="confirmRuleExport"
+    />
   </div>
 </template>
 
@@ -228,6 +246,7 @@ import { buildRangeMarkerTimeline } from './log-timeline/rangeMarkers'
 import {
   buildRangeExportFileName,
   buildStructuredExportFileName,
+  createExportTimestamp,
   createRangeExportContentHash,
   deleteRangeExportMachineOption,
   extractDateFromFileName,
@@ -360,6 +379,12 @@ const matchedExportContent = ref('')
 const matchedExportContentHash = ref('')
 const matchedExportHashing = ref(false)
 let matchedExportHashRequestVersion = 0
+const ruleExportDialogVisible = ref(false)
+const ruleExportContent = ref('')
+const ruleExportContentHash = ref('')
+const ruleExportTimestamp = ref('')
+const ruleExportHashing = ref(false)
+let ruleExportHashRequestVersion = 0
 
 const resetMatchedExportState = () => {
   matchedExportHashRequestVersion += 1
@@ -368,6 +393,15 @@ const resetMatchedExportState = () => {
   matchedExportContent.value = ''
   matchedExportContentHash.value = ''
   matchedExportHashing.value = false
+}
+
+const resetRuleExportState = () => {
+  ruleExportHashRequestVersion += 1
+  ruleExportDialogVisible.value = false
+  ruleExportContent.value = ''
+  ruleExportContentHash.value = ''
+  ruleExportTimestamp.value = ''
+  ruleExportHashing.value = false
 }
 
 const resetRangeExportState = () => {
@@ -379,6 +413,7 @@ const resetRangeExportState = () => {
   rangeExportContentHash.value = ''
   rangeExportHashing.value = false
   resetMatchedExportState()
+  resetRuleExportState()
 }
 
 const viewRef = shallowRef<EditorView>()
@@ -2077,22 +2112,66 @@ const onJsonFileSelected = async (e: Event) => {
   if (jsonFileInput.value) jsonFileInput.value.value = ''
 }
 
-const exportJsonConfig = () => {
+const exportJsonConfig = async () => {
+  if (ruleExportHashing.value) {
+    return
+  }
+
   const data = {
     ceidMatchMode: ceidMatchMode.value,
     customCeidRule: customCeidRule.value,
     ceidRules: rulesList.value,
     sxfyRules: sxfyList.value
   }
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'secs-log-rules.json'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+
+  const exportContent = `${JSON.stringify(data, null, 2)}\n`
+  const requestVersion = ++ruleExportHashRequestVersion
+  ruleExportHashing.value = true
+
+  try {
+    const contentHash = await createRangeExportContentHash(exportContent)
+    if (requestVersion !== ruleExportHashRequestVersion) {
+      return
+    }
+
+    ruleExportContent.value = exportContent
+    ruleExportContentHash.value = contentHash
+    ruleExportTimestamp.value = createExportTimestamp()
+    ruleExportDialogVisible.value = true
+  } catch (error: unknown) {
+    if (requestVersion === ruleExportHashRequestVersion) {
+      ElMessage.error(`生成规则文件信息失败: ${getErrorMessage(error)}`)
+    }
+  } finally {
+    if (requestVersion === ruleExportHashRequestVersion) {
+      ruleExportHashing.value = false
+    }
+  }
+}
+
+const confirmRuleExport = ({ machineId }: { machineId: string, batchId: string }) => {
+  if (!ruleExportContent.value || !ruleExportContentHash.value || !ruleExportTimestamp.value) {
+    ElMessage.warning('导出信息已失效，请重新导出规则')
+    ruleExportDialogVisible.value = false
+    return
+  }
+
+  const fileName = buildStructuredExportFileName({
+    machineId,
+    batchId: '',
+    fallbackSegment: 'secs-log-rules',
+    logDate: ruleExportTimestamp.value,
+    contentHash: ruleExportContentHash.value,
+    extension: 'json'
+  })
+  const savedSettings = saveRangeExportMachineSettings(machineId, rangeExportMachineOptions.value)
+  rangeExportMachineOptions.value = savedSettings.machineIds
+
+  downloadBlobFile(
+    new Blob([ruleExportContent.value], { type: 'application/json;charset=utf-8' }),
+    fileName
+  )
+  ruleExportDialogVisible.value = false
   ElMessage.success('配置导出成功')
 }
 

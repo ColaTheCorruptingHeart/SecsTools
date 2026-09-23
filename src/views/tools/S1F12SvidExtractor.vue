@@ -14,7 +14,7 @@
 
         <div class="flex items-center gap-2 bg-fill-light p-1.5 rounded-lg border border-border-lighter flex-wrap">
           <el-button size="small" type="primary" class="!rounded-md shadow-sm" :loading="loading" :disabled="loading" @click="handleExtract">解析并提取</el-button>
-          <el-button size="small" class="!rounded-md" :disabled="loading || !rows.length" @click="exportCsv">导出 CSV</el-button>
+          <el-button size="small" class="!rounded-md" :loading="exportHashing" :disabled="loading || exportHashing || !rows.length" @click="exportCsv">导出 CSV</el-button>
           <div class="w-px h-4 bg-border-strong mx-1"></div>
           <el-button size="small" type="danger" plain class="!rounded-md" :disabled="loading" @click="clearAll">清空</el-button>
         </div>
@@ -49,7 +49,7 @@
       </div>
     </section>
 
-    <div class="flex-1 grid grid-cols-1 xl:grid-cols-2 gap-4 min-h-0">
+    <div class="flex-1 grid grid-cols-1 xl:grid-cols-[minmax(0,4fr)_minmax(0,6fr)] gap-4 min-h-0">
       <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
         <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-2">
           <span class="text-sm font-medium text-fg-regular">S1F12 原始报文</span>
@@ -94,14 +94,40 @@
         </div>
       </div>
     </div>
+
+    <ExportFileNameDialog
+      v-model="exportDialogVisible"
+      title="导出 S1F12 SVID"
+      :machine-options="deviceOptions"
+      fallback-segment="s1f12-svid"
+      :log-date="exportTimestamp"
+      :content-hash="exportContentHash"
+      extension="csv"
+      confirm-label="导出 CSV"
+      machine-only
+      machine-label="设备号"
+      machine-placeholder="可选，可输入新设备号"
+      date-label="时间戳"
+      @deleteMachineOption="removeDeviceOption"
+      @confirm="confirmCsvExport"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElInput, ElMessage, ElMessageBox } from 'element-plus'
+import { ElInput, ElMessage } from 'element-plus'
 import { ArrowDown, ArrowUp, Document, WarningFilled } from '@element-plus/icons-vue'
 import { h, nextTick, ref } from 'vue'
 import type { SmlDiagnostic } from './secsSml'
+import ExportFileNameDialog from './log-timeline/components/ExportFileNameDialog.vue'
+import {
+  buildStructuredExportFileName,
+  createExportTimestamp,
+  createRangeExportContentHash,
+  deleteRangeExportMachineOption,
+  loadRangeExportMachineSettings,
+  saveRangeExportMachineSettings
+} from './log-timeline/rangeExport'
 
 interface SvidRow {
   index: number
@@ -112,12 +138,19 @@ interface SvidRow {
 }
 
 const sourceTextareaRef = ref<HTMLTextAreaElement | null>(null)
-const deviceId = ref('')
 const rows = ref<SvidRow[]>([])
 const diagnostics = ref<SmlDiagnostic[]>([])
 const diagnosticsOpen = ref(true)
 const loading = ref(false)
 const loadingText = '正在解析 S1F12 报文，请稍候...'
+const savedDeviceSettings = loadRangeExportMachineSettings()
+const deviceOptions = ref(savedDeviceSettings.machineIds)
+const exportDialogVisible = ref(false)
+const exportContent = ref('')
+const exportContentHash = ref('')
+const exportTimestamp = ref('')
+const exportHashing = ref(false)
+let exportHashRequestVersion = 0
 
 const columnMinWidths = {
   index: 80,
@@ -252,6 +285,7 @@ async function handleExtract() {
   if (loading.value) return
 
   loading.value = true
+  resetExportState()
   rows.value = []
   diagnostics.value = []
 
@@ -302,25 +336,7 @@ function escapeCsvCell(value: string) {
   return normalized
 }
 
-async function exportCsv() {
-  if (!rows.value.length) {
-    ElMessage.warning('当前没有可导出的数据')
-    return
-  }
-
-  try {
-    const { value } = await ElMessageBox.prompt('如需在文件名前添加设备号，请在下方填写。', '导出 CSV', {
-      inputValue: deviceId.value,
-      inputPlaceholder: '可选设备号',
-      confirmButtonText: '导出',
-      cancelButtonText: '取消'
-    })
-
-    deviceId.value = value.trim()
-  } catch {
-    return
-  }
-
+function buildCsvExportContent() {
   const header = ['序号', 'SVID', 'SVNAME', 'UNITS', '备注']
   const content = [
     header.join(','),
@@ -333,22 +349,84 @@ async function exportCsv() {
     ].join(','))
   ].join('\n')
 
-  const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' })
+  return '\uFEFF' + content
+}
+
+async function exportCsv() {
+  if (!rows.value.length) {
+    ElMessage.warning('当前没有可导出的数据')
+    return
+  }
+
+  if (exportHashing.value) return
+
+  const nextExportContent = buildCsvExportContent()
+  const requestVersion = ++exportHashRequestVersion
+  exportHashing.value = true
+
+  try {
+    const contentHash = await createRangeExportContentHash(nextExportContent)
+    if (requestVersion !== exportHashRequestVersion) return
+
+    exportContent.value = nextExportContent
+    exportContentHash.value = contentHash
+    exportTimestamp.value = createExportTimestamp()
+    exportDialogVisible.value = true
+  } catch (error) {
+    if (requestVersion === exportHashRequestVersion) {
+      ElMessage.error(`生成导出文件信息失败: ${error instanceof Error ? error.message : '未知错误'}`)
+    }
+  } finally {
+    if (requestVersion === exportHashRequestVersion) {
+      exportHashing.value = false
+    }
+  }
+}
+
+function confirmCsvExport({ machineId }: { machineId: string, batchId: string }) {
+  if (!exportContent.value || !exportContentHash.value || !exportTimestamp.value) {
+    ElMessage.warning('导出信息已失效，请重新导出')
+    exportDialogVisible.value = false
+    return
+  }
+
+  const fileName = buildStructuredExportFileName({
+    machineId,
+    batchId: '',
+    fallbackSegment: 's1f12-svid',
+    logDate: exportTimestamp.value,
+    contentHash: exportContentHash.value,
+    extension: 'csv'
+  })
+  const savedSettings = saveRangeExportMachineSettings(machineId, deviceOptions.value)
+  deviceOptions.value = savedSettings.machineIds
+
+  const blob = new Blob([exportContent.value], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
-  const now = new Date()
-  const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`
-  const normalizedDeviceId = deviceId.value.trim().replace(/[\\/:*?"<>|]/g, '-')
-  const fileNamePrefix = normalizedDeviceId ? `${normalizedDeviceId}-` : ''
-
   link.href = url
-  link.download = `${fileNamePrefix}s1f12-svid-${timestamp}.csv`
+  link.download = fileName
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
 
+  exportDialogVisible.value = false
   ElMessage.success('CSV 导出成功')
+}
+
+function removeDeviceOption(machineId: string) {
+  const savedSettings = deleteRangeExportMachineOption(machineId, deviceOptions.value)
+  deviceOptions.value = savedSettings.machineIds
+}
+
+function resetExportState() {
+  exportHashRequestVersion += 1
+  exportDialogVisible.value = false
+  exportContent.value = ''
+  exportContentHash.value = ''
+  exportTimestamp.value = ''
+  exportHashing.value = false
 }
 
 function clearAll() {
@@ -357,7 +435,7 @@ function clearAll() {
   if (sourceTextareaRef.value) {
     sourceTextareaRef.value.value = ''
   }
-  deviceId.value = ''
+  resetExportState()
   rows.value = []
   diagnostics.value = []
 }

@@ -57,7 +57,7 @@
     <div class="p-2 border-t border-border flex-none flex flex-col gap-2 bg-fill-light">
       <div class="flex gap-2">
         <el-button class="flex-1 !ml-0" size="small" @click="emit('triggerJsonImport')">导入规则</el-button>
-        <el-button class="flex-1 !ml-0" size="small" @click="emit('exportJsonConfig')">导出规则</el-button>
+        <el-button class="flex-1 !ml-0" size="small" :loading="exportLoading" :disabled="exportLoading" @click="emit('exportJsonConfig')">导出规则</el-button>
       </div>
       <div class="flex gap-2">
         <el-button class="w-full" size="small" type="primary" @click="emit('rulesChanged')" :disabled="!hasLogContent">重新分析全记录</el-button>
@@ -76,6 +76,7 @@ const props = defineProps<{
   sxfyList: SxFyRuleItem[]
   predefineColors: string[]
   hasLogContent: boolean
+  exportLoading: boolean
 }>()
 
 const emit = defineEmits<{
