@@ -1,29 +1,29 @@
 ﻿<template>
   <div class="h-full flex flex-col gap-4">
     <!-- Header Controls -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 flex-none">
+    <div class="bg-surface rounded-xl border border-border shadow-sm p-4 flex-none">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div class="flex items-center gap-2">
-          <div class="p-2 bg-pink-50 dark:bg-pink-900/30 rounded-lg">
-            <el-icon class="text-pink-500 text-xl"><Switch /></el-icon>
+          <div class="p-2 bg-primary-soft rounded-lg">
+            <el-icon class="text-primary text-xl"><Switch /></el-icon>
           </div>
           <div>
-            <h2 class="text-lg font-semibold text-slate-800 dark:text-gray-100 m-0">进制转换</h2>
-            <p class="text-xs text-slate-500 dark:text-gray-400 m-0 mt-0.5">支持多个数字同转，在线进制相互转化并带有历史记录</p>
+            <h2 class="text-lg font-semibold text-fg m-0">进制转换</h2>
+            <p class="text-xs text-fg-muted m-0 mt-0.5">支持多个数字同转，在线进制相互转化并带有历史记录</p>
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded-lg border border-slate-100 dark:border-slate-700">
+        <div class="flex flex-wrap items-center gap-2 bg-fill-light p-1.5 rounded-lg border border-border-lighter">
           <el-button size="small" type="primary" class="!rounded-md shadow-sm" @click="handleConvert">
             转换并记录
           </el-button>
-          <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+          <div class="w-px h-4 bg-border-strong mx-1"></div>
           <el-button size="small" type="danger" plain class="!rounded-md" @click="inputText = ''">清空输入</el-button>
         </div>
       </div>
 
       <!-- Options -->
-      <div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-slate-600 dark:text-slate-300">
+      <div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-fg-regular">
         <div class="flex items-center gap-2">
           <span class="font-medium">输入类型 (源格式):</span>
           <el-radio-group v-model="inputBase" size="small">
@@ -39,10 +39,10 @@
     <!-- Main Content -->
     <div class="flex-1 flex flex-col gap-4 min-h-0">
       <!-- Input Panel -->
-      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col flex-none">
-        <div class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 px-4 py-2 flex items-center justify-between shrink-0">
-          <span class="text-sm font-medium text-slate-600 dark:text-slate-300">输入区</span>
-          <span class="text-xs text-slate-400 hidden sm:inline-block">使用英文半角逗号 (,) 分隔多个数字。例如: 10, 15, 2A</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col flex-none">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between shrink-0">
+          <span class="text-sm font-medium text-fg-regular">输入区</span>
+          <span class="text-xs text-fg-placeholder hidden sm:inline-block">使用英文半角逗号 (,) 分隔多个数字。例如: 10, 15, 2A</span>
         </div>
         <el-input
           v-model="inputText"
@@ -56,9 +56,9 @@
       </div>
 
       <!-- History Panel -->
-      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col flex-auto overflow-hidden">
-        <div class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 px-4 py-2 flex items-center justify-between shrink-0">
-          <span class="text-sm font-medium text-slate-600 dark:text-slate-300">转换历史</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col flex-auto overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between shrink-0">
+          <span class="text-sm font-medium text-fg-regular">转换历史</span>
           <el-button type="danger" size="small" plain @click="clearHistory" :disabled="!historyList.length">
             <el-icon class="mr-1"><Delete /></el-icon> 清空历史
           </el-button>
@@ -76,7 +76,7 @@
             <el-table-column prop="time" label="时间" min-width="100" />
             <el-table-column label="原始输入" min-width="150">
               <template #default="{ row }">
-                <span class="font-mono text-blue-600 dark:text-blue-400">{{ row.original }}</span>
+                <span class="font-mono text-primary">{{ row.original }}</span>
                 <el-tag size="small" class="ml-2" type="info">{{ row.sourceBase }}进制</el-tag>
               </template>
             </el-table-column>

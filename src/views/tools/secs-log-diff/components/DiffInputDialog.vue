@@ -135,9 +135,9 @@ async function handleFileChange(event: Event, side: 'baseline' | 'target') {
   min-height: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #dbe3ef;
+  border: 1px solid var(--el-border-color-light);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--el-bg-color);
 }
 
 .input-pane__header,
@@ -146,16 +146,16 @@ async function handleFileChange(event: Event, side: 'baseline' | 'target') {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-bottom: 1px solid var(--el-border-color);
+  background: var(--el-fill-color-light);
   padding: 8px 12px;
-  color: #475569;
+  color: var(--el-text-color-regular);
   font-size: 13px;
   font-weight: 600;
 }
 
 .input-pane__header span:last-child {
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
   font-size: 12px;
   font-weight: 500;
 }
@@ -184,7 +184,7 @@ async function handleFileChange(event: Event, side: 'baseline' | 'target') {
 }
 
 .dialog-footer span {
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
 }
 

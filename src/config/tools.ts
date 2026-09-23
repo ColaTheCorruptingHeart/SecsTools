@@ -67,11 +67,11 @@ export const toolsConfig: ToolCategory[] = [
     tools: [
       {
         id: 'sml-builder',
-        name: 'SECS SML构造器',
+        name: 'SECS SML 构造器',
         desc: '通过参数表和结构树创建复杂 SML，自动维护 List 数量并实时校验。',
         path: '/tools/sml-builder',
         icon: 'SetUp',
-        color: '#087f8c',
+        color: '#fc3c4c',
         componentPath: 'SmlBuilder'
       },
       {
@@ -98,7 +98,7 @@ export const toolsConfig: ToolCategory[] = [
         desc: '导入或粘贴 SVID 列表，按指定数据格式生成 S1F3 W 命令。',
         path: '/tools/s1f3-generator',
         icon: 'EditPen',
-        color: '#0d9488', // teal-600
+        color: '#cc8ef2',
         componentPath: 'S1F3Generator'
       },
       {

@@ -1,15 +1,15 @@
 ﻿<template>
   <div class="h-full flex flex-col gap-4" v-loading="loading" :element-loading-text="loadingText">
     <input ref="txtFileInputRef" type="file" accept=".txt,text/plain" class="hidden" @change="handleTxtFileChange" />
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex-none">
+    <div class="bg-surface rounded-xl border border-border shadow-sm p-4 flex-none">
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div class="flex items-center gap-3">
-          <div class="p-2 bg-blue-50 rounded-lg">
-            <el-icon class="text-blue-600 text-xl"><Monitor /></el-icon>
+          <div class="p-2 bg-primary-soft rounded-lg">
+            <el-icon class="text-primary text-xl"><Monitor /></el-icon>
           </div>
           <div>
-            <h2 class="text-lg font-semibold text-slate-800 m-0">RecipeBody 分析器</h2>
-            <p class="text-xs text-slate-500 m-0 mt-0.5">输入内容即 Body 数据，支持直接粘贴或导入 TXT 文件全文</p>
+            <h2 class="text-lg font-semibold text-fg m-0">RecipeBody 分析器</h2>
+            <p class="text-xs text-fg-muted m-0 mt-0.5">输入内容即 Body 数据，支持直接粘贴或导入 TXT 文件全文</p>
           </div>
         </div>
 
@@ -23,11 +23,11 @@
     </div>
 
     <div class="flex-1 grid grid-cols-1 xl:grid-cols-[0.95fr_1.05fr] gap-4 min-h-0">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-0 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col min-h-0 overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
           <div class="flex items-center gap-3 flex-wrap">
-            <span class="text-sm font-medium text-slate-700">输入区</span>
-            <span v-if="importedFileName" class="text-xs text-slate-400">已导入 {{ importedFileName }}</span>
+            <span class="text-sm font-medium text-fg-regular">输入区</span>
+            <span v-if="importedFileName" class="text-xs text-fg-placeholder">已导入 {{ importedFileName }}</span>
           </div>
           <div class="header-inline-field">
             <span class="header-inline-label">输入类型</span>
@@ -50,9 +50,9 @@
       </div>
 
       <div class="flex flex-col gap-4 min-h-0">
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-0 max-h-80 xl:max-h-88 overflow-hidden">
-          <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
-            <span class="text-sm font-medium text-slate-700">分析摘要</span>
+        <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col min-h-0 max-h-80 xl:max-h-88 overflow-hidden">
+          <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+            <span class="text-sm font-medium text-fg-regular">分析摘要</span>
             <div class="flex items-center gap-2">
               <el-tag v-if="result" type="primary">{{ sourceTypeLabel(result.sourceType) }}</el-tag>
               <el-button size="small" text @click="toggleSummaryCollapsed">
@@ -64,43 +64,43 @@
           <template v-if="!isSummaryCollapsed && result && analysis">
             <div class="flex-1 min-h-0 overflow-auto p-4 pr-3">
               <div class="flex flex-wrap gap-2 text-xs leading-5">
-                <span class="rounded-md bg-slate-50 px-2 py-1 text-slate-600">字节 {{ result.bodyLength }}</span>
-                <span class="rounded-md bg-slate-50 px-2 py-1 text-slate-600">输入 {{ result.inputSize }}</span>
-                <span class="rounded-md bg-slate-50 px-2 py-1 text-slate-600">熵 {{ analysis.entropy.toFixed(4) }}</span>
-                <span class="rounded-md bg-slate-50 px-2 py-1 text-slate-600">ASCII {{ formatRatio(analysis.printableAsciiRatio) }}</span>
-                <span class="rounded-md bg-slate-50 px-2 py-1 text-slate-600">NULL {{ formatRatio(analysis.nullByteRatio) }}</span>
-                <span class="rounded-md bg-slate-50 px-2 py-1 text-slate-600">高位 {{ formatRatio(analysis.highByteRatio) }}</span>
+                <span class="rounded-md bg-fill-light px-2 py-1 text-fg-regular">字节 {{ result.bodyLength }}</span>
+                <span class="rounded-md bg-fill-light px-2 py-1 text-fg-regular">输入 {{ result.inputSize }}</span>
+                <span class="rounded-md bg-fill-light px-2 py-1 text-fg-regular">熵 {{ analysis.entropy.toFixed(4) }}</span>
+                <span class="rounded-md bg-fill-light px-2 py-1 text-fg-regular">ASCII {{ formatRatio(analysis.printableAsciiRatio) }}</span>
+                <span class="rounded-md bg-fill-light px-2 py-1 text-fg-regular">NULL {{ formatRatio(analysis.nullByteRatio) }}</span>
+                <span class="rounded-md bg-fill-light px-2 py-1 text-fg-regular">高位 {{ formatRatio(analysis.highByteRatio) }}</span>
               </div>
 
-              <div class="mt-2 space-y-2 text-xs text-slate-600">
+              <div class="mt-2 space-y-2 text-xs text-fg-regular">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <span>换行 LF {{ analysis.newlineStats.lf }} / CR {{ analysis.newlineStats.cr }} / CRLF {{ analysis.newlineStats.crlf }}</span>
-                  <span v-if="analysis.newlineStats.mixed" class="text-amber-600">存在混用</span>
+                  <span v-if="analysis.newlineStats.mixed" class="text-warning">存在混用</span>
                   <span v-if="analysis.magicMatches.length">文件头签名 {{ analysis.magicMatches.join(' / ') }}</span>
-                  <span v-else class="text-slate-400">文件头签名未识别</span>
+                  <span v-else class="text-fg-placeholder">文件头签名未识别</span>
                 </div>
 
-                <div v-if="primaryCandidateFormat" class="rounded-md bg-slate-50 px-3 py-2">
-                  <div class="flex items-center justify-between gap-3 text-sm text-slate-800">
+                <div v-if="primaryCandidateFormat" class="rounded-md bg-fill-light px-3 py-2">
+                  <div class="flex items-center justify-between gap-3 text-sm text-fg">
                     <span class="font-medium">{{ primaryCandidateFormat.label }}</span>
-                    <span class="text-slate-500">{{ formatRatio(primaryCandidateFormat.confidence) }}</span>
+                    <span class="text-fg-muted">{{ formatRatio(primaryCandidateFormat.confidence) }}</span>
                   </div>
-                  <div class="mt-0.5 text-xs text-slate-500">{{ primaryCandidateFormat.reason }}</div>
+                  <div class="mt-0.5 text-xs text-fg-muted">{{ primaryCandidateFormat.reason }}</div>
                 </div>
 
-                <div v-if="summaryWarningText" class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
+                <div v-if="summaryWarningText" class="rounded-md border border-warning-border bg-warning-soft px-3 py-2 text-warning">
                   {{ summaryWarningText }}
                 </div>
               </div>
             </div>
           </template>
-          <div v-else-if="!isSummaryCollapsed" class="flex-1 p-4 text-sm text-slate-400">完成解析后将显示摘要信息</div>
+          <div v-else-if="!isSummaryCollapsed" class="flex-1 p-4 text-sm text-fg-placeholder">完成解析后将显示摘要信息</div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden">
-          <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+        <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden">
+          <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
             <div class="flex items-center gap-3 flex-wrap">
-              <span class="text-sm font-medium text-slate-700">转换结果</span>
+              <span class="text-sm font-medium text-fg-regular">转换结果</span>
             </div>
             <div class="flex items-center gap-2 flex-wrap justify-end">
               <div class="header-inline-field">
@@ -139,7 +139,7 @@
                 :title="outputResult.note || '当前数据可能是压缩包或归档数据，已不再尝试转换为可读字符串。'"
               />
               <template v-else>
-                <div v-if="outputDisplayNote" class="px-4 pt-3 text-xs text-slate-500">{{ outputDisplayNote }}</div>
+                <div v-if="outputDisplayNote" class="px-4 pt-3 text-xs text-fg-muted">{{ outputDisplayNote }}</div>
                 <div v-if="outputViewMode === 'highlight'" class="flex-1 min-h-0 overflow-hidden recipe-body-preview-shell">
                   <Codemirror
                     v-model="outputPreviewModel"
@@ -158,7 +158,7 @@
               </template>
             </div>
           </template>
-          <div v-else class="flex-1 flex items-center justify-center text-sm text-slate-400">
+          <div v-else class="flex-1 flex items-center justify-center text-sm text-fg-placeholder">
             完成解析后将显示完整转换结果
           </div>
         </div>
@@ -331,7 +331,7 @@ const outputPreviewTheme = EditorView.theme({
     height: '100%',
     fontSize: '14px',
     backgroundColor: 'transparent',
-    color: '#334155',
+    color: 'var(--el-text-color-primary)',
   },
   '.cm-scroller': {
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
@@ -351,7 +351,7 @@ const outputPreviewTheme = EditorView.theme({
     display: 'none',
   },
   '.cm-selectionBackground, ::selection': {
-    backgroundColor: '#cbd5e1 !important',
+    backgroundColor: 'var(--el-color-primary-light-8) !important',
   },
   '&.cm-focused': {
     outline: 'none',
@@ -710,7 +710,7 @@ function describeEscapeSequence(token: string) {
 
 .header-inline-label {
   font-size: 0.75rem;
-  color: rgb(100 116 139);
+  color: var(--el-text-color-secondary);
   white-space: nowrap;
   line-height: 1;
 }
@@ -728,8 +728,8 @@ function describeEscapeSequence(token: string) {
 .recipe-body-preview-shell {
   flex: 1 1 auto;
   min-height: 0;
-  border-top: 1px solid rgb(226 232 240);
-  background: #fff;
+  border-top: 1px solid var(--el-border-color);
+  background: var(--el-bg-color);
 }
 
 .recipe-body-preview-shell :deep(.cm-editor) {
@@ -748,8 +748,8 @@ function describeEscapeSequence(token: string) {
   margin: 0 0.08rem;
   padding: 0.04rem 0.34rem;
   border-radius: 0.22rem;
-  background: #b91c1c;
-  color: #fff;
+  background: var(--el-color-danger);
+  color: var(--el-color-white);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.02em;

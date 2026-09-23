@@ -6,7 +6,7 @@
     destroy-on-close
   >
     <el-form label-position="top" class="export-file-name-form" @submit.prevent="confirmExport">
-      <el-form-item label="机台号">
+      <el-form-item :label="machineLabel">
         <el-select
           v-model="machineId"
           class="w-full"
@@ -14,16 +14,16 @@
           filterable
           allow-create
           default-first-option
-          placeholder="可选，可输入新机台号"
+          :placeholder="machinePlaceholder"
         >
           <el-option v-for="option in machineOptions" :key="option" :label="option" :value="option">
             <div class="flex min-w-0 items-center justify-between gap-2">
               <span class="truncate">{{ option }}</span>
               <button
                 type="button"
-                class="flex h-6 w-6 shrink-0 items-center justify-center text-slate-400 transition-colors hover:text-red-500"
-                :title="`删除机台号 ${option}`"
-                :aria-label="`删除机台号 ${option}`"
+                class="flex h-6 w-6 shrink-0 items-center justify-center text-fg-placeholder transition-colors hover:text-danger"
+                :title="`删除${machineLabel} ${option}`"
+                :aria-label="`删除${machineLabel} ${option}`"
                 @mousedown.prevent.stop
                 @click.prevent.stop="removeMachineOption(option)"
               >
@@ -34,12 +34,12 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="批次号">
+      <el-form-item v-if="!machineOnly" label="批次号">
         <el-input v-model="batchId" clearable :placeholder="`可选，留空时使用 ${fallbackSegment}`" />
       </el-form-item>
 
       <div class="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
-        <el-form-item label="日志日期">
+        <el-form-item :label="dateLabel">
           <el-input :model-value="logDate || 'unknown-date'" readonly />
         </el-form-item>
 
@@ -50,7 +50,7 @@
 
       <el-form-item label="导出文件名" class="mb-0!">
         <div
-          class="w-full overflow-hidden rounded border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs leading-5 text-slate-700 dark:border-slate-600 dark:bg-slate-900/60 dark:text-slate-200"
+          class="w-full overflow-hidden rounded border border-border bg-fill-light px-3 py-2 font-mono text-xs leading-5 text-fg-regular"
           :title="fileNamePreview"
         >
           <span class="block truncate">{{ fileNamePreview }}</span>
@@ -79,8 +79,16 @@ const props = withDefaults(defineProps<{
   contentHash: string
   extension: string
   confirmLabel?: string
+  machineOnly?: boolean
+  machineLabel?: string
+  machinePlaceholder?: string
+  dateLabel?: string
 }>(), {
-  confirmLabel: '导出'
+  confirmLabel: '导出',
+  machineOnly: false,
+  machineLabel: '机台号',
+  machinePlaceholder: '可选，可输入新机台号',
+  dateLabel: '日志日期'
 })
 
 const emit = defineEmits<{
@@ -99,7 +107,7 @@ const visibleModel = computed({
 
 const fileNamePreview = computed(() => buildStructuredExportFileName({
   machineId: machineId.value,
-  batchId: batchId.value,
+  batchId: props.machineOnly ? '' : batchId.value,
   fallbackSegment: props.fallbackSegment,
   logDate: props.logDate,
   contentHash: props.contentHash,
@@ -127,14 +135,14 @@ const removeMachineOption = (option: string) => {
 const confirmExport = () => {
   emit('confirm', {
     machineId: machineId.value.trim(),
-    batchId: batchId.value.trim()
+    batchId: props.machineOnly ? '' : batchId.value.trim()
   })
 }
 </script>
 
 <style scoped>
 .export-file-name-form :deep(.el-form-item__label) {
-  color: #475569;
+  color: var(--el-text-color-regular);
   font-size: 13px;
   line-height: 20px;
   margin-bottom: 5px;

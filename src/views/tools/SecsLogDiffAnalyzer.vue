@@ -308,7 +308,7 @@ const diffOverviewMarks = computed(() => {
 const editorTheme = EditorView.theme({
   '&': {
     height: '100%',
-    backgroundColor: '#ffffff'
+    backgroundColor: 'var(--el-bg-color)'
   },
   '.cm-scroller': {
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important',
@@ -322,9 +322,9 @@ const editorTheme = EditorView.theme({
     padding: '0 10px'
   },
   '.cm-gutters': {
-    backgroundColor: '#f8fafc',
-    borderRight: '1px solid #e2e8f0',
-    color: '#94a3b8'
+    backgroundColor: 'var(--el-fill-color-light)',
+    borderRight: '1px solid var(--el-border-color)',
+    color: 'var(--el-text-color-placeholder)'
   },
   '.cm-secs-added': {
     backgroundColor: 'rgba(16, 185, 129, 0.16)',
@@ -390,11 +390,11 @@ const editorTheme = EditorView.theme({
   },
   '@keyframes secs-diff-flash': {
     '0%, 100%': {
-      backgroundColor: 'rgba(14, 165, 233, 0.10)'
+      backgroundColor: 'var(--el-color-primary-light-9)'
     },
     '50%': {
-      backgroundColor: 'rgba(14, 165, 233, 0.34)',
-      boxShadow: 'inset 3px 0 0 #0284c7'
+      backgroundColor: 'var(--el-color-primary-light-8)',
+      boxShadow: 'inset 3px 0 0 var(--el-color-primary-dark-2)'
     }
   },
   '@keyframes secs-diff-flash-added': {
@@ -402,8 +402,8 @@ const editorTheme = EditorView.theme({
       backgroundColor: 'rgba(16, 185, 129, 0.14)'
     },
     '50%': {
-      backgroundColor: 'rgba(14, 165, 233, 0.34)',
-      boxShadow: 'inset 3px 0 0 #0284c7'
+      backgroundColor: 'var(--el-color-primary-light-8)',
+      boxShadow: 'inset 3px 0 0 var(--el-color-primary-dark-2)'
     }
   },
   '@keyframes secs-diff-flash-missing': {
@@ -411,8 +411,8 @@ const editorTheme = EditorView.theme({
       backgroundColor: 'rgba(239, 68, 68, 0.12)'
     },
     '50%': {
-      backgroundColor: 'rgba(14, 165, 233, 0.32)',
-      boxShadow: 'inset 3px 0 0 #0284c7'
+      backgroundColor: 'var(--el-color-primary-light-8)',
+      boxShadow: 'inset 3px 0 0 var(--el-color-primary-dark-2)'
     }
   },
   '@keyframes secs-diff-flash-changed': {
@@ -420,8 +420,8 @@ const editorTheme = EditorView.theme({
       backgroundColor: 'rgba(245, 158, 11, 0.14)'
     },
     '50%': {
-      backgroundColor: 'rgba(14, 165, 233, 0.34)',
-      boxShadow: 'inset 3px 0 0 #0284c7'
+      backgroundColor: 'var(--el-color-primary-light-8)',
+      boxShadow: 'inset 3px 0 0 var(--el-color-primary-dark-2)'
     }
   },
   '@keyframes secs-diff-flash-ack-error': {
@@ -429,8 +429,8 @@ const editorTheme = EditorView.theme({
       backgroundColor: 'rgba(220, 38, 38, 0.14)'
     },
     '50%': {
-      backgroundColor: 'rgba(14, 165, 233, 0.36)',
-      boxShadow: 'inset 3px 0 0 #0284c7'
+      backgroundColor: 'var(--el-color-primary-light-8)',
+      boxShadow: 'inset 3px 0 0 var(--el-color-primary-dark-2)'
     }
   },
   '@keyframes secs-diff-flash-parse-error': {
@@ -438,8 +438,8 @@ const editorTheme = EditorView.theme({
       backgroundColor: 'rgba(139, 92, 246, 0.14)'
     },
     '50%': {
-      backgroundColor: 'rgba(14, 165, 233, 0.34)',
-      boxShadow: 'inset 3px 0 0 #0284c7'
+      backgroundColor: 'var(--el-color-primary-light-8)',
+      boxShadow: 'inset 3px 0 0 var(--el-color-primary-dark-2)'
     }
   }
 })
@@ -1339,9 +1339,9 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--el-border-color);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--el-bg-color);
   padding: 8px 12px;
 }
 
@@ -1351,7 +1351,7 @@ onUnmounted(() => {
 
 .topbar h1 {
   margin: 0;
-  color: #1e293b;
+  color: var(--el-text-color-primary);
   font-size: 15px;
   font-weight: 750;
   line-height: 22px;
@@ -1360,7 +1360,7 @@ onUnmounted(() => {
 .topbar p {
   overflow: hidden;
   margin: 0;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
   line-height: 18px;
   text-overflow: ellipsis;
@@ -1405,11 +1405,11 @@ onUnmounted(() => {
 }
 
 .warning-strip span {
-  border: 1px solid #fed7aa;
+  border: 1px solid var(--el-color-warning-light-5);
   border-radius: 5px;
-  background: #fff7ed;
+  background: var(--el-color-warning-light-9);
   padding: 4px 7px;
-  color: #c2410c;
+  color: var(--el-color-warning);
   font-size: 12px;
   line-height: 16px;
 }
@@ -1428,9 +1428,9 @@ onUnmounted(() => {
   min-height: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--el-border-color);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--el-bg-color);
 }
 
 .diff-pane__header {
@@ -1439,14 +1439,14 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-bottom: 1px solid var(--el-border-color);
+  background: var(--el-fill-color-light);
   padding: 7px 12px;
 }
 
 .diff-pane__header h2 {
   margin: 0;
-  color: #334155;
+  color: var(--el-text-color-primary);
   font-size: 14px;
   font-weight: 700;
   line-height: 20px;
@@ -1454,7 +1454,7 @@ onUnmounted(() => {
 
 .diff-pane__header p {
   margin: 0;
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
   font-size: 12px;
   line-height: 16px;
 }
@@ -1528,11 +1528,11 @@ onUnmounted(() => {
   align-items: center;
   gap: 14px;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--el-border-color);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--el-fill-color-light);
   padding: 5px 10px;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
   white-space: nowrap;
 }
@@ -1542,9 +1542,9 @@ onUnmounted(() => {
   z-index: 3000;
   min-width: 148px;
   padding: 4px;
-  border: 1px solid #dbe3ef;
+  border: 1px solid var(--el-border-color-light);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--el-bg-color);
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
 }
 
@@ -1555,7 +1555,7 @@ onUnmounted(() => {
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: #334155;
+  color: var(--el-text-color-primary);
   font-size: 13px;
   line-height: 18px;
   text-align: left;
@@ -1564,20 +1564,20 @@ onUnmounted(() => {
 
 .diff-block-context-menu__item:hover,
 .diff-block-context-menu__item:focus-visible {
-  background: #eef6ff;
-  color: #0369a1;
+  background: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
   outline: none;
 }
 
 .diff-block-context-menu__item:disabled {
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
   cursor: not-allowed;
 }
 
 .diff-block-context-menu__item:disabled:hover,
 .diff-block-context-menu__item:disabled:focus-visible {
   background: transparent;
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
 }
 
 .empty-state {
@@ -1586,21 +1586,21 @@ onUnmounted(() => {
   flex: 1;
   align-items: center;
   justify-content: center;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--el-border-color-darker);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--el-fill-color-light);
   text-align: center;
 }
 
 .empty-state h2 {
   margin: 0;
-  color: #334155;
+  color: var(--el-text-color-primary);
   font-size: 16px;
 }
 
 .empty-state p {
   margin: 8px 0 14px;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 13px;
 }
 
@@ -1617,12 +1617,12 @@ onUnmounted(() => {
 :deep(.cm-scroller::-webkit-scrollbar-thumb) {
   border: 4px solid transparent;
   border-radius: 9999px;
-  background-color: rgba(100, 116, 139, 0.8);
+  background-color: var(--el-text-color-placeholder);
   background-clip: padding-box;
 }
 
 :deep(.cm-scroller::-webkit-scrollbar-thumb:hover) {
-  background-color: rgba(71, 85, 105, 1);
+  background-color: var(--el-text-color-secondary);
 }
 
 @media (max-width: 1100px) {

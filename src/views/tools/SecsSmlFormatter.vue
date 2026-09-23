@@ -2,9 +2,9 @@
   <div class="h-full flex flex-col gap-4" v-loading="loading" :element-loading-text="loadingText">
 
     <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
-          <span class="text-sm font-medium text-slate-600">原始 SECS 日志</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+          <span class="text-sm font-medium text-fg-regular">原始 SECS 日志</span>
           <div class="flex items-center gap-2">
             <el-segmented
               v-model="parseMode"
@@ -34,11 +34,11 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <span class="text-sm font-medium text-slate-600">格式化结果</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <span class="text-sm font-medium text-fg-regular">格式化结果</span>
           <div class="flex items-center gap-2 flex-wrap sm:justify-end">
-            <span v-if="selectedPath" class="text-xs text-slate-400 font-mono max-w-[200px] truncate" :title="selectedPath">
+            <span v-if="selectedPath" class="text-xs text-fg-placeholder font-mono max-w-[200px] truncate" :title="selectedPath">
               {{ '当前位置：' + selectedPath }}
             </span>
             <el-button size="small" class="!rounded-md" :icon="SetUp" :disabled="loading || !formattedText" @click="sendFormattedResultToSmlBuilder">发送至SML构造器</el-button>
@@ -57,7 +57,7 @@
           </div>
         </div>
 
-        <div class="flex-1 overflow-hidden relative bg-slate-50/30">
+        <div class="flex-1 overflow-hidden relative bg-fill-light">
           <Codemirror
             v-if="formattedText"
             v-model="formattedTextModel"
@@ -65,7 +65,7 @@
             :extensions="outputExtensions"
             @ready="handleOutputReady"
           />
-          <div v-else class="h-full flex items-center justify-center text-slate-400 text-sm">
+          <div v-else class="h-full flex items-center justify-center text-fg-placeholder text-sm">
             结果将在此显示...
           </div>
         </div>
@@ -74,14 +74,14 @@
 
     <section
       v-if="diagnostics.length"
-      class="diagnostics-panel shrink-0 overflow-hidden bg-white border border-slate-200 shadow-sm"
+      class="diagnostics-panel shrink-0 overflow-hidden bg-surface border border-border shadow-sm"
       :class="diagnosticsOpen ? 'diagnostics-panel--open' : 'diagnostics-panel--closed'"
       aria-labelledby="diagnostics-title"
       data-testid="diagnostics-panel"
     >
       <div class="diagnostics-header">
         <div class="flex min-w-0 items-center gap-3">
-          <h2 id="diagnostics-title" class="m-0 text-sm font-semibold text-slate-700">解析诊断</h2>
+          <h2 id="diagnostics-title" class="m-0 text-sm font-semibold text-fg-regular">解析诊断</h2>
           <div class="flex items-center gap-2 text-xs">
             <span v-if="diagnosticCounts.error" class="diagnostic-count diagnostic-count--error">
               {{ diagnosticCounts.error }} 错误
@@ -202,7 +202,7 @@ const outputTheme = EditorView.theme({
     padding: '1px 12px 1px 34px',
     minHeight: '22px',
     position: 'relative',
-    color: '#334155'
+    color: 'var(--el-text-color-primary)'
   },
   '.cm-foldable-line': {
     cursor: 'pointer'
@@ -213,7 +213,7 @@ const outputTheme = EditorView.theme({
     top: '1px',
     width: '16px',
     lineHeight: '22px',
-    color: '#64748b',
+    color: 'var(--el-text-color-secondary)',
     fontSize: '12px',
     textAlign: 'center'
   },
@@ -224,12 +224,12 @@ const outputTheme = EditorView.theme({
     content: '"▸"'
   },
   '.cm-gutters': {
-    backgroundColor: '#f8fafc',
-    color: '#94a3b8',
-    borderRight: '1px solid #e2e8f0'
+    backgroundColor: 'var(--el-fill-color-light)',
+    color: 'var(--el-text-color-placeholder)',
+    borderRight: '1px solid var(--el-border-color)'
   },
   '.cm-active-path-line': {
-    backgroundColor: '#fde68a'
+    backgroundColor: 'var(--el-color-primary-light-8)'
   },
   '&.cm-focused': {
     outline: 'none'
@@ -771,8 +771,8 @@ onMounted(() => {
 
 .source-textarea:disabled {
   cursor: not-allowed;
-  color: rgb(100 116 139);
-  background-color: rgb(248 250 252 / 0.7);
+  color: var(--el-text-color-secondary);
+  background-color: var(--el-fill-color-light);
 }
 
 .diagnostics-panel {
@@ -795,8 +795,8 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid rgb(226 232 240);
-  background: rgb(248 250 252);
+  border-bottom: 1px solid var(--el-border-color);
+  background: var(--el-fill-color-light);
 }
 
 .diagnostic-count {
@@ -810,21 +810,21 @@ onMounted(() => {
 }
 
 .diagnostic-count--error {
-  color: rgb(185 28 28);
-  border-color: rgb(254 202 202);
-  background: rgb(254 242 242);
+  color: var(--el-color-danger);
+  border-color: var(--el-color-danger-light-5);
+  background: var(--el-color-danger-light-9);
 }
 
 .diagnostic-count--warning {
-  color: rgb(161 98 7);
-  border-color: rgb(253 230 138);
-  background: rgb(255 251 235);
+  color: var(--el-color-warning);
+  border-color: var(--el-color-warning-light-5);
+  background: var(--el-color-warning-light-9);
 }
 
 .diagnostics-list {
   height: calc(100% - 42px);
   overflow: auto;
-  background: rgb(255 255 255);
+  background: var(--el-bg-color);
 }
 
 .diagnostic-row {
@@ -837,8 +837,8 @@ onMounted(() => {
   padding: 6px 14px 6px 11px;
   border: 0;
   border-left: 3px solid transparent;
-  border-bottom: 1px solid rgb(241 245 249);
-  color: rgb(51 65 85);
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  color: var(--el-text-color-primary);
   background: transparent;
   text-align: left;
   cursor: pointer;
@@ -847,28 +847,28 @@ onMounted(() => {
 .diagnostic-row:hover,
 .diagnostic-row:focus-visible,
 .diagnostic-row--active {
-  background: rgb(248 250 252);
+  background: var(--el-fill-color-light);
   outline: none;
 }
 
 .diagnostic-row--error {
-  border-left-color: rgb(220 38 38);
+  border-left-color: var(--el-color-danger);
 }
 
 .diagnostic-row--warning {
-  border-left-color: rgb(217 119 6);
+  border-left-color: var(--el-color-warning);
 }
 
 .diagnostic-row--error .diagnostic-icon {
-  color: rgb(220 38 38);
+  color: var(--el-color-danger);
 }
 
 .diagnostic-row--warning .diagnostic-icon {
-  color: rgb(217 119 6);
+  color: var(--el-color-warning);
 }
 
 .diagnostic-location {
-  color: rgb(100 116 139);
+  color: var(--el-text-color-secondary);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 12px;
 }
@@ -876,7 +876,7 @@ onMounted(() => {
 .diagnostic-message {
   min-width: 0;
   overflow: hidden;
-  color: rgb(51 65 85);
+  color: var(--el-text-color-primary);
   font-size: 13px;
   line-height: 20px;
   text-overflow: ellipsis;

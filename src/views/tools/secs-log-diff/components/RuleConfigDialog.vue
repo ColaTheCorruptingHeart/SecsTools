@@ -500,9 +500,9 @@ watch(
 .rule-editor,
 .rule-editor-empty {
   min-height: 0;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--el-border-color);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--el-bg-color);
 }
 
 .rule-list {
@@ -520,10 +520,10 @@ watch(
 }
 
 .rule-list__head {
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-bottom: 1px solid var(--el-border-color);
+  background: var(--el-fill-color-light);
   padding: 9px 10px;
-  color: #334155;
+  color: var(--el-text-color-primary);
   font-size: 13px;
   font-weight: 700;
 }
@@ -550,12 +550,12 @@ watch(
 
 .rule-list__item:hover,
 .rule-list__item.is-active {
-  border-left-color: #2563eb;
-  background: #f8fafc;
+  border-left-color: var(--el-color-primary);
+  background: var(--el-fill-color-light);
 }
 
 .rule-list__sf {
-  color: #1e293b;
+  color: var(--el-text-color-primary);
   font-size: 13px;
   font-weight: 700;
   line-height: 18px;
@@ -563,7 +563,7 @@ watch(
 
 .rule-list__meta {
   overflow: hidden;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
   line-height: 16px;
   text-overflow: ellipsis;
@@ -581,9 +581,9 @@ watch(
 }
 
 .editor-section {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--el-border-color);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--el-bg-color);
   padding: 10px;
 }
 
@@ -597,7 +597,7 @@ watch(
 
 .editor-section__head h3 {
   margin: 0;
-  color: #334155;
+  color: var(--el-text-color-primary);
   font-size: 13px;
   font-weight: 700;
   line-height: 18px;
@@ -620,7 +620,7 @@ watch(
   display: grid;
   gap: 4px;
   min-width: 0;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
   line-height: 16px;
 }
@@ -652,7 +652,7 @@ watch(
 }
 
 .rule-config__footer span {
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
 }
 

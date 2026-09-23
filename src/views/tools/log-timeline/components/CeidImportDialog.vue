@@ -1,6 +1,6 @@
 ﻿<template>
   <el-dialog v-model="visibleModel" title="导入 CEID 匹配规则" width="500px">
-    <div class="mb-2 text-sm text-slate-500">
+    <div class="mb-2 text-sm text-fg-muted">
       请输入或粘贴 CEID 对应规则，格式为 每行：<code>CEID=描述</code>
     </div>
     <el-input

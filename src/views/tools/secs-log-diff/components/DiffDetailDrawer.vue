@@ -120,7 +120,7 @@ function formatMessageText(text: string) {
 
 <style scoped>
 :deep(.el-drawer__body) {
-  background: #f8fafc;
+  background: var(--el-fill-color-light);
   padding: 12px;
   overflow-y: auto;
 }
@@ -135,9 +135,9 @@ function formatMessageText(text: string) {
 
 .detail__summary,
 .detail__section {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--el-border-color);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--el-bg-color);
   padding: 12px;
 }
 
@@ -165,8 +165,8 @@ function formatMessageText(text: string) {
 }
 
 .detail__kind {
-  background: #f1f5f9;
-  color: #334155;
+  background: var(--el-fill-color);
+  color: var(--el-text-color-primary);
 }
 
 .detail__kind--added {
@@ -197,27 +197,27 @@ function formatMessageText(text: string) {
 
 .detail__severity,
 .detail__section-head span {
-  background: #f8fafc;
-  color: #64748b;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-secondary);
 }
 
 .detail h3 {
   margin: 0;
-  color: #1e293b;
+  color: var(--el-text-color-primary);
   font-size: 15px;
   line-height: 22px;
 }
 
 .detail p {
   margin: 6px 0 0;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 13px;
   line-height: 20px;
 }
 
 .detail h4 {
   margin: 0 0 8px;
-  color: #334155;
+  color: var(--el-text-color-primary);
   font-size: 13px;
   font-weight: 700;
   line-height: 18px;
@@ -240,7 +240,7 @@ function formatMessageText(text: string) {
 }
 
 .detail dt {
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
 }
 
@@ -248,7 +248,7 @@ function formatMessageText(text: string) {
   min-width: 0;
   overflow-wrap: anywhere;
   margin: 0;
-  color: #334155;
+  color: var(--el-text-color-primary);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 12px;
 }
@@ -257,9 +257,9 @@ function formatMessageText(text: string) {
   position: relative;
   min-height: 0;
   overflow: visible;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--el-border-color-darker);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--el-bg-color);
 }
 
 .message-diff-wrap :deep(.code-diff-view) {
@@ -271,8 +271,8 @@ function formatMessageText(text: string) {
 }
 
 .message-diff-wrap :deep(.code-diff-view .file-header) {
-  background: #f8fafc;
-  border-bottom-color: #e2e8f0;
+  background: var(--el-fill-color-light);
+  border-bottom-color: var(--el-border-color);
 }
 
 .message-diff-wrap :deep(.code-diff-view .diff-table .blob-code-inner),
@@ -294,12 +294,12 @@ function formatMessageText(text: string) {
 .message-diff-wrap :deep(.code-diff-view::-webkit-scrollbar-thumb) {
   border: 4px solid transparent;
   border-radius: 9999px;
-  background-color: rgba(100, 116, 139, 0.8);
+  background-color: var(--el-text-color-placeholder);
   background-clip: padding-box;
 }
 
 .message-diff-wrap :deep(.code-diff-view::-webkit-scrollbar-thumb:hover) {
-  background-color: rgba(71, 85, 105, 1);
+  background-color: var(--el-text-color-secondary);
 }
 
 .message-diff-wrap :deep(.code-diff-view::-webkit-scrollbar-corner) {

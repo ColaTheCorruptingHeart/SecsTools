@@ -1,21 +1,21 @@
 ﻿<template>
   <div class="h-full min-h-0">
     <div class="flex h-full min-h-0 flex-col gap-3">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm px-4 py-3">
+      <div class="bg-surface rounded-xl border border-border shadow-sm px-4 py-3">
         <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
           <div class="flex items-center gap-2">
-            <div class="p-1.5 bg-teal-50 rounded-lg">
-              <el-icon class="text-teal-600 text-lg"><EditPen /></el-icon>
+            <div class="p-1.5 bg-primary-soft rounded-lg">
+              <el-icon class="text-primary text-lg"><EditPen /></el-icon>
             </div>
             <div>
-              <h2 class="text-lg font-semibold text-slate-800 m-0">S1F3 生成器</h2>
-              <p class="text-xs text-slate-500 m-0 mt-0.5">支持导入 S1F12 导出的 SVID 表格，或手动粘贴 SVID 列表后生成 S1F3 命令</p>
+              <h2 class="text-lg font-semibold text-fg m-0">S1F3 生成器</h2>
+              <p class="text-xs text-fg-muted m-0 mt-0.5">支持导入 S1F12 导出的 SVID 表格，或手动粘贴 SVID 列表后生成 S1F3 命令</p>
             </div>
           </div>
 
-          <div class="w-full xl:w-auto flex flex-wrap items-center gap-2 rounded-xl bg-slate-50/80 p-2">
+          <div class="w-full xl:w-auto flex flex-wrap items-center gap-2 rounded-xl bg-fill-light p-2">
             <div class="flex items-center gap-2 rounded-md  px-2 py-1 shrink-0 whitespace-nowrap">
-              <span class="text-xs text-slate-600">数据格式</span>
+              <span class="text-xs text-fg-regular">数据格式</span>
               <el-input v-model="dataFormat" size="small" class="shrink-0" style="width: 2.5rem" placeholder="U4" />
             </div>
             <el-button size="small" type="primary" class="!rounded-md" @click="parseInput">生成S1F3</el-button>
@@ -29,12 +29,12 @@
       </div>
 
       <div class="grid flex-1 min-h-0 grid-cols-1 gap-3 xl:grid-cols-[minmax(290px,0.98fr)_minmax(320px,0.82fr)_minmax(340px,1.08fr)]">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex min-h-[320px] flex-col overflow-hidden xl:min-h-0">
-        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center justify-between gap-3">
-          <span class="text-sm font-medium text-slate-600 whitespace-nowrap shrink-0">SVID生成</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex min-h-[320px] flex-col overflow-hidden xl:min-h-0">
+        <div class="bg-fill-light border-b border-border px-3 py-2 flex items-center justify-between gap-3">
+          <span class="text-sm font-medium text-fg-regular whitespace-nowrap shrink-0">SVID生成</span>
           <div class="flex items-center justify-end shrink-0 min-w-0">
             <div class="flex items-center gap-2 shrink-0 whitespace-nowrap rounded-lg ">
-              <span class="text-xs text-slate-500 shrink-0">回填方式</span>
+              <span class="text-xs text-fg-muted shrink-0">回填方式</span>
               <el-select v-model="generatedInputWriteMode" size="small" class="shrink-0 generated-mode-select">
                 <el-option label="覆盖" value="overwrite" />
                 <el-option label="追加" value="append" />
@@ -46,28 +46,28 @@
         <div class="flex-1 overflow-auto p-3 flex flex-col">
           <div class="pb-3">
             <div class="flex items-center justify-between gap-2 mb-2">
-              <span class="text-sm font-medium text-slate-700">区间生成</span>
-              <span class="text-xs text-slate-400">按闭区间生成</span>
+              <span class="text-sm font-medium text-fg-regular">区间生成</span>
+              <span class="text-xs text-fg-placeholder">按闭区间生成</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-end">
               <div>
-                <div class="text-[11px] text-slate-500 mb-1">起始值</div>
+                <div class="text-[11px] text-fg-muted mb-1">起始值</div>
                 <el-input v-model="rangeStart" size="small" placeholder="1001 / 3E9" />
               </div>
               <div>
-                <div class="text-[11px] text-slate-500 mb-1">步长</div>
+                <div class="text-[11px] text-fg-muted mb-1">步长</div>
                 <el-input v-model="rangeStep" size="small" placeholder="1 / A" />
               </div>
               <div>
-                <div class="text-[11px] text-slate-500 mb-1">结束值</div>
+                <div class="text-[11px] text-fg-muted mb-1">结束值</div>
                 <el-input v-model="rangeEnd" size="small" placeholder="1020 / 3FC" />
               </div>
             </div>
 
             <div class="mt-2.5 grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-end">
               <div>
-                <div class="text-[11px] text-slate-500 mb-1">进制</div>
+                <div class="text-[11px] text-fg-muted mb-1">进制</div>
                 <el-select v-model="rangeRadix" size="small" class="w-full">
                   <el-option label="10进制" value="10" />
                   <el-option label="16进制" value="16" />
@@ -77,31 +77,31 @@
             </div>
           </div>
 
-          <div class="border-t border-slate-200 pt-3">
+          <div class="border-t border-border pt-3">
             <div class="flex items-center justify-between gap-2 mb-2">
-              <span class="text-sm font-medium text-slate-700">规则生成</span>
-              <span class="text-xs text-slate-400">普通递增或模板占位</span>
+              <span class="text-sm font-medium text-fg-regular">规则生成</span>
+              <span class="text-xs text-fg-placeholder">普通递增或模板占位</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
-                <div class="text-[11px] text-slate-500 mb-1">模板</div>
+                <div class="text-[11px] text-fg-muted mb-1">模板</div>
                 <el-input v-model="sequencePattern" size="small" placeholder="留空或 10**1" />
               </div>
               <div>
-                <div class="text-[11px] text-slate-500 mb-1">起始值</div>
+                <div class="text-[11px] text-fg-muted mb-1">起始值</div>
                 <el-input v-model="sequenceStart" size="small" placeholder="1 / A" />
               </div>
               <div>
-                <div class="text-[11px] text-slate-500 mb-1">递增数量</div>
+                <div class="text-[11px] text-fg-muted mb-1">递增数量</div>
                 <el-input v-model="sequenceCount" size="small" placeholder="3" />
               </div>
               <div>
-                <div class="text-[11px] text-slate-500 mb-1">步长</div>
+                <div class="text-[11px] text-fg-muted mb-1">步长</div>
                 <el-input v-model="sequenceStep" size="small" placeholder="2 / F" />
               </div>
               <div>
-                <div class="text-[11px] text-slate-500 mb-1">进制</div>
+                <div class="text-[11px] text-fg-muted mb-1">进制</div>
                 <el-select v-model="sequenceRadix" size="small" class="w-full">
                   <el-option label="10进制" value="10" />
                   <el-option label="16进制" value="16" />
@@ -112,16 +112,16 @@
               </div>
             </div>
 
-            <div class="mt-2 text-[11px] text-slate-500 leading-4.5">
+            <div class="mt-2 text-[11px] text-fg-muted leading-4.5">
               模板中的 * 只能出现一次且必须连续；有几个 *，生成段就有几位。
             </div>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex min-h-[360px] flex-col overflow-hidden xl:min-h-0">
-        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center justify-between gap-2">
-          <span class="text-sm font-medium text-slate-600">SVID 输入区</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex min-h-[360px] flex-col overflow-hidden xl:min-h-0">
+        <div class="bg-fill-light border-b border-border px-3 py-2 flex items-center justify-between gap-2">
+          <span class="text-sm font-medium text-fg-regular">SVID 输入区</span>
           <el-button size="small" class="!rounded-md" :disabled="!rawInput.trim()" @click="convertHexInputToDecimal">16进制转10进制</el-button>
         </div>
 
@@ -136,14 +136,14 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex min-h-[320px] flex-col overflow-hidden xl:min-h-0">
-        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex flex-col gap-2">
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex min-h-[320px] flex-col overflow-hidden xl:min-h-0">
+        <div class="bg-fill-light border-b border-border px-3 py-2 flex flex-col gap-2">
           <div class="flex items-center justify-between gap-2">
-            <span class="text-sm font-medium text-slate-600">S1F3 命令结果</span>
+            <span class="text-sm font-medium text-fg-regular">S1F3 命令结果</span>
           </div>
         </div>
 
-        <div class="flex-1 overflow-hidden relative bg-slate-50/30">
+        <div class="flex-1 overflow-hidden relative bg-fill-light">
           <el-input
             :model-value="commandText"
             type="textarea"

@@ -192,9 +192,9 @@ defineExpose({
   flex: 0 0 290px;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--el-border-color);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--el-bg-color);
 }
 
 .diff-nav__header {
@@ -202,14 +202,14 @@ defineExpose({
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-bottom: 1px solid var(--el-border-color);
+  background: var(--el-fill-color-light);
   padding: 9px 10px;
 }
 
 .diff-nav__header h2 {
   margin: 0;
-  color: #334155;
+  color: var(--el-text-color-primary);
   font-size: 14px;
   font-weight: 700;
   line-height: 20px;
@@ -217,7 +217,7 @@ defineExpose({
 
 .diff-nav__header p {
   margin: 0;
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
   font-size: 12px;
   line-height: 16px;
 }
@@ -263,7 +263,7 @@ defineExpose({
 
 .diff-nav__item:hover,
 .diff-nav__item.is-active {
-  background: #f8fafc;
+  background: var(--el-fill-color-light);
 }
 
 .diff-nav__item.is-flashing {
@@ -294,11 +294,11 @@ defineExpose({
 @keyframes diff-nav-flash {
   0%,
   100% {
-    background: #f8fafc;
+    background: var(--el-fill-color-light);
   }
 
   50% {
-    background: #dbeafe;
+    background: var(--el-color-primary-light-8);
   }
 }
 
@@ -395,9 +395,9 @@ defineExpose({
 
 .diff-nav__tag {
   border-radius: 4px;
-  background: var(--diff-nav-tag-bg, #f1f5f9);
+  background: var(--diff-nav-tag-bg, var(--el-fill-color));
   padding: 2px 5px;
-  color: var(--diff-nav-tag-fg, #475569);
+  color: var(--diff-nav-tag-fg, var(--el-text-color-regular));
   font-size: 11px;
   font-weight: 700;
   line-height: 16px;
@@ -406,9 +406,9 @@ defineExpose({
 .diff-nav__index {
   min-width: 22px;
   border-radius: 4px;
-  background: #f1f5f9;
+  background: var(--el-fill-color);
   padding: 2px 4px;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 11px;
   font-weight: 700;
@@ -419,7 +419,7 @@ defineExpose({
 .diff-nav__title {
   min-width: 0;
   overflow: hidden;
-  color: #334155;
+  color: var(--el-text-color-primary);
   font-size: 12px;
   font-weight: 650;
   line-height: 18px;
@@ -429,7 +429,7 @@ defineExpose({
 
 .diff-nav__lines {
   grid-column: 1 / -1;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 11px;
   line-height: 16px;
