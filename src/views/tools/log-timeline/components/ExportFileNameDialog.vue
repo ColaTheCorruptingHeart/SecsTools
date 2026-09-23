@@ -21,7 +21,7 @@
               <span class="truncate">{{ option }}</span>
               <button
                 type="button"
-                class="flex h-6 w-6 shrink-0 items-center justify-center text-slate-400 transition-colors hover:text-red-500"
+                class="flex h-6 w-6 shrink-0 items-center justify-center text-fg-placeholder transition-colors hover:text-danger"
                 :title="`删除机台号 ${option}`"
                 :aria-label="`删除机台号 ${option}`"
                 @mousedown.prevent.stop
@@ -50,7 +50,7 @@
 
       <el-form-item label="导出文件名" class="mb-0!">
         <div
-          class="w-full overflow-hidden rounded border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs leading-5 text-slate-700 dark:border-slate-600 dark:bg-slate-900/60 dark:text-slate-200"
+          class="w-full overflow-hidden rounded border border-border bg-fill-light px-3 py-2 font-mono text-xs leading-5 text-fg-regular"
           :title="fileNamePreview"
         >
           <span class="block truncate">{{ fileNamePreview }}</span>
@@ -134,7 +134,7 @@ const confirmExport = () => {
 
 <style scoped>
 .export-file-name-form :deep(.el-form-item__label) {
-  color: #475569;
+  color: var(--el-text-color-regular);
   font-size: 13px;
   line-height: 20px;
   margin-bottom: 5px;

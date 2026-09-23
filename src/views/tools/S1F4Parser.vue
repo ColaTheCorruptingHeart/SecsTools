@@ -1,29 +1,29 @@
 ﻿<template>
   <div class="h-full flex flex-col gap-4" v-loading="loading" :element-loading-text="loadingText">
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+    <div class="bg-surface rounded-xl border border-border shadow-sm p-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div class="flex items-center gap-2">
-          <div class="p-2 bg-teal-50 rounded-lg">
-            <el-icon class="text-teal-600 text-xl"><Document /></el-icon>
+          <div class="p-2 bg-primary-soft rounded-lg">
+            <el-icon class="text-primary text-xl"><Document /></el-icon>
           </div>
           <div>
-            <h2 class="text-lg font-semibold text-slate-800 m-0">S1F4 解析</h2>
-            <p class="text-xs text-slate-500 m-0 mt-0.5">按 SVNAME 的顺序解析 S1F4 报文，并把每个 Value 映射到对应的 SVNAME</p>
+            <h2 class="text-lg font-semibold text-fg m-0">S1F4 解析</h2>
+            <p class="text-xs text-fg-muted m-0 mt-0.5">按 SVNAME 的顺序解析 S1F4 报文，并把每个 Value 映射到对应的 SVNAME</p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-100 flex-wrap">
+        <div class="flex items-center gap-2 bg-fill-light p-1.5 rounded-lg border border-border-lighter flex-wrap">
           <el-button size="small" type="primary" class="!rounded-md shadow-sm" :loading="loading" :disabled="loading" @click="handleParse">解析并匹配</el-button>
-          <div class="w-px h-4 bg-slate-300 mx-1"></div>
+          <div class="w-px h-4 bg-border-strong mx-1"></div>
           <el-button size="small" type="danger" plain class="!rounded-md" :disabled="loading" @click="clearAll">清空</el-button>
         </div>
       </div>
     </div>
 
     <div class="flex-1 grid grid-cols-1 xl:grid-cols-[minmax(0,3fr)_minmax(0,3fr)_minmax(0,4fr)] gap-4 min-h-0">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-2">
-          <span class="text-sm font-medium text-slate-600">SVNAME列表</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-2">
+          <span class="text-sm font-medium text-fg-regular">SVNAME列表</span>
         </div>
         <div class="flex-1 overflow-hidden relative">
           <textarea
@@ -36,9 +36,9 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-2">
-          <span class="text-sm font-medium text-slate-600">S1F4 报文</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-2">
+          <span class="text-sm font-medium text-fg-regular">S1F4 报文</span>
         </div>
         <div class="flex-1 overflow-hidden relative">
           <textarea
@@ -51,9 +51,9 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-2 flex-wrap">
-          <span class="text-sm font-medium text-slate-600">映射结果</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-2 flex-wrap">
+          <span class="text-sm font-medium text-fg-regular">映射结果</span>
           <div class="flex items-center gap-2 flex-wrap">
             <el-tag size="small" type="info" round>SVNAME {{ mappingNames.length }}</el-tag>
             <el-tag size="small" type="success" round>Value {{ valueItems.length }}</el-tag>
@@ -426,28 +426,28 @@ function clearAll() {
 
 .source-textarea:disabled {
   cursor: not-allowed;
-  color: rgb(100 116 139);
-  background-color: rgb(248 250 252 / 0.7);
+  color: var(--el-text-color-secondary);
+  background-color: var(--el-fill-color-light);
 }
 
 .parser-virtual-table :deep(.el-table-v2__header-cell),
 .parser-virtual-table :deep(.el-table-v2__row-cell) {
-  border-bottom: 1px solid rgb(226 232 240);
-  border-right: 1px solid rgb(226 232 240);
+  border-bottom: 1px solid var(--el-border-color);
+  border-right: 1px solid var(--el-border-color);
 }
 
 .parser-virtual-table :deep(.el-table-v2__header-cell) {
-  background: rgb(248 250 252);
-  color: rgb(71 85 105);
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-regular);
   font-weight: 500;
 }
 
 .parser-virtual-table :deep(.el-table-v2__row-cell) {
-  background: rgb(255 255 255);
+  background: var(--el-bg-color);
 }
 
 .parser-virtual-table :deep(.el-table-v2__row:hover .el-table-v2__row-cell) {
-  background: rgb(248 250 252);
+  background: var(--el-fill-color-light);
 }
 
 .table-cell {

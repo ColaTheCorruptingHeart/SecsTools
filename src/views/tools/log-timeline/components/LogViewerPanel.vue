@@ -1,9 +1,9 @@
 ﻿<template>
-  <div class="flex-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col overflow-hidden min-h-75 lg:min-h-0">
-    <div class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 px-4 py-2 flex items-center justify-between gap-3">
+  <div class="flex-1 bg-surface rounded-xl border border-border shadow-sm flex flex-col overflow-hidden min-h-75 lg:min-h-0">
+    <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-3">
       <div class="flex min-w-0 items-center gap-2 text-sm">
-        <span class="shrink-0 font-medium text-slate-600 dark:text-slate-300">日志内容</span>
-        <span v-if="logFileName" class="truncate text-xs text-slate-400 dark:text-slate-500" :title="logFileName">
+        <span class="shrink-0 font-medium text-fg-regular">日志内容</span>
+        <span v-if="logFileName" class="truncate text-xs text-fg-placeholder" :title="logFileName">
           {{ logFileName }}
         </span>
       </div>
@@ -12,7 +12,7 @@
     <div class="flex-1 overflow-hidden relative group">
       <div
         v-if="logContent !== null && performanceHint"
-        class="pointer-events-none absolute top-3 right-4 z-20 rounded bg-slate-900/75 px-2 py-1 text-[11px] text-white shadow-sm"
+        class="pointer-events-none absolute top-3 right-4 z-20 rounded bg-fill-dark px-2 py-1 text-[11px] text-fg shadow-sm"
       >
         {{ performanceHint }}
       </div>
@@ -25,7 +25,7 @@
         @ready="emit('ready', $event)"
         @scroll="emit('scroll')"
       />
-      <div v-else class="h-full flex items-center justify-center text-slate-400 text-sm">
+      <div v-else class="h-full flex items-center justify-center text-fg-placeholder text-sm">
         请点击上方按钮加载日志文件，支持多文件导入
       </div>
 

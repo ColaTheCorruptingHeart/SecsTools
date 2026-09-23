@@ -1,9 +1,9 @@
 ﻿<template>
   <div class="h-full flex flex-col gap-4">
     <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 h-0 min-h-[500px]">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between shrink-0">
-          <span class="text-sm font-medium text-slate-600">原数据输入</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm overflow-hidden flex flex-col h-full">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between shrink-0">
+          <span class="text-sm font-medium text-fg-regular">原数据输入</span>
           <div class="flex items-center gap-2">
             <el-button size="small" type="primary" class="!rounded-md shadow-sm" @click="formatJson">格式化 (2空格)</el-button>
             <el-button size="small" class="!rounded-md" @click="compressJson">压缩</el-button>
@@ -19,9 +19,9 @@
         />
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between shrink-0">
-          <span class="text-sm font-medium text-slate-600">处理结果</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm overflow-hidden flex flex-col h-full">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between shrink-0">
+          <span class="text-sm font-medium text-fg-regular">处理结果</span>
           <div class="flex items-center gap-2">
             <el-button
               v-if="resultJson && !hasError"
@@ -33,7 +33,7 @@
               <el-icon class="mr-1"><DocumentCopy /></el-icon> 复制
             </el-button>
             <div class="flex items-center gap-2" v-if="isValidObj && !isCompressed">
-              <span class="text-xs text-slate-500">展开层级:</span>
+              <span class="text-xs text-fg-muted">展开层级:</span>
               <el-select v-model="deep" size="small" style="width: 80px" @change="handleDeepChange">
                 <el-option label="1层" :value="1" />
                 <el-option label="2层" :value="2" />
@@ -44,9 +44,9 @@
             </div>
           </div>
         </div>
-        <div class="flex-1 bg-slate-50/30 overflow-auto p-4 custom-scrollbar">
+        <div class="flex-1 bg-fill-light overflow-auto p-4 custom-scrollbar">
           <template v-if="hasError">
-            <div class="text-red-500 font-mono whitespace-pre-wrap text-sm">{{ errorMsg }}</div>
+            <div class="text-danger font-mono whitespace-pre-wrap text-sm">{{ errorMsg }}</div>
           </template>
           <template v-else-if="resultObj !== null && !isCompressed">
             <vue-json-pretty
@@ -62,7 +62,7 @@
             <div class="font-mono text-sm whitespace-pre-wrap break-all">{{ resultJson }}</div>
           </template>
           <template v-else>
-            <div class="text-slate-400 text-sm">结果将在此显示...</div>
+            <div class="text-fg-placeholder text-sm">结果将在此显示...</div>
           </template>
         </div>
       </div>
@@ -185,10 +185,10 @@ const clear = () => {
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.4);
+  background-color: var(--el-border-color-darker);
   border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(148, 163, 184, 0.6);
+  background-color: var(--el-text-color-placeholder);
 }
 </style>

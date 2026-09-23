@@ -1,21 +1,21 @@
 ﻿<template>
   <div class="h-full flex flex-col gap-4" v-loading="loading" :element-loading-text="loadingText">
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+    <div class="bg-surface rounded-xl border border-border shadow-sm p-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div class="flex items-center gap-2">
-          <div class="p-2 bg-cyan-50 rounded-lg">
-            <el-icon class="text-cyan-600 text-xl"><Document /></el-icon>
+          <div class="p-2 bg-primary-soft rounded-lg">
+            <el-icon class="text-primary text-xl"><Document /></el-icon>
           </div>
           <div>
-            <h2 class="text-lg font-semibold text-slate-800 m-0">S1F12 SVID 提取</h2>
-            <p class="text-xs text-slate-500 m-0 mt-0.5">粘贴 S1F12 报文，自动解析并提取 SVID List 内容</p>
+            <h2 class="text-lg font-semibold text-fg m-0">S1F12 SVID 提取</h2>
+            <p class="text-xs text-fg-muted m-0 mt-0.5">粘贴 S1F12 报文，自动解析并提取 SVID List 内容</p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-100 flex-wrap">
+        <div class="flex items-center gap-2 bg-fill-light p-1.5 rounded-lg border border-border-lighter flex-wrap">
           <el-button size="small" type="primary" class="!rounded-md shadow-sm" :loading="loading" :disabled="loading" @click="handleExtract">解析并提取</el-button>
           <el-button size="small" class="!rounded-md" :disabled="loading || !rows.length" @click="exportCsv">导出 CSV</el-button>
-          <div class="w-px h-4 bg-slate-300 mx-1"></div>
+          <div class="w-px h-4 bg-border-strong mx-1"></div>
           <el-button size="small" type="danger" plain class="!rounded-md" :disabled="loading" @click="clearAll">清空</el-button>
         </div>
       </div>
@@ -50,9 +50,9 @@
     </section>
 
     <div class="flex-1 grid grid-cols-1 xl:grid-cols-2 gap-4 min-h-0">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-2">
-          <span class="text-sm font-medium text-slate-600">S1F12 原始报文</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-2">
+          <span class="text-sm font-medium text-fg-regular">S1F12 原始报文</span>
         </div>
         <div class="flex-1 overflow-hidden relative">
           <textarea
@@ -65,9 +65,9 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between gap-2">
-          <span class="text-sm font-medium text-slate-600">提取结果</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between gap-2">
+          <span class="text-sm font-medium text-fg-regular">提取结果</span>
           <el-tag size="small" type="info" round>共 {{ rows.length }} 条</el-tag>
         </div>
 
@@ -379,15 +379,15 @@ function clearAll() {
 
 .source-textarea:disabled {
   cursor: not-allowed;
-  color: rgb(100 116 139);
-  background-color: rgb(248 250 252 / 0.7);
+  color: var(--el-text-color-secondary);
+  background-color: var(--el-fill-color-light);
 }
 
 .svid-diagnostics {
   overflow: hidden;
-  border: 1px solid rgb(253 230 138);
+  border: 1px solid var(--el-color-warning-light-5);
   border-radius: 6px;
-  background: rgb(255 251 235);
+  background: var(--el-color-warning-light-9);
 }
 
 .svid-diagnostics__toggle {
@@ -399,7 +399,7 @@ function clearAll() {
   border: 0;
   background: transparent;
   padding: 7px 12px;
-  color: rgb(161 98 7);
+  color: var(--el-color-warning);
   cursor: pointer;
 }
 
@@ -414,8 +414,8 @@ function clearAll() {
 .svid-diagnostics__list {
   max-height: 116px;
   overflow: auto;
-  border-top: 1px solid rgb(253 230 138);
-  background: rgb(255 255 255);
+  border-top: 1px solid var(--el-color-warning-light-5);
+  background: var(--el-bg-color);
 }
 
 .svid-diagnostics__row {
@@ -424,11 +424,11 @@ function clearAll() {
   grid-template-columns: 58px minmax(0, 1fr);
   gap: 8px;
   border: 0;
-  border-bottom: 1px solid rgb(241 245 249);
-  border-left: 3px solid rgb(217 119 6);
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  border-left: 3px solid var(--el-color-warning);
   background: transparent;
   padding: 6px 10px;
-  color: rgb(71 85 105);
+  color: var(--el-text-color-regular);
   font-size: 12px;
   line-height: 18px;
   text-align: left;
@@ -436,33 +436,33 @@ function clearAll() {
 }
 
 .svid-diagnostics__row--error {
-  border-left-color: rgb(220 38 38);
+  border-left-color: var(--el-color-danger);
 }
 
 .svid-diagnostics__row:hover,
 .svid-diagnostics__row:focus-visible {
-  background: rgb(248 250 252);
+  background: var(--el-fill-color-light);
   outline: none;
 }
 
 .svid-virtual-table :deep(.el-table-v2__header-cell),
 .svid-virtual-table :deep(.el-table-v2__row-cell) {
-  border-bottom: 1px solid rgb(226 232 240);
-  border-right: 1px solid rgb(226 232 240);
+  border-bottom: 1px solid var(--el-border-color);
+  border-right: 1px solid var(--el-border-color);
 }
 
 .svid-virtual-table :deep(.el-table-v2__header-cell) {
-  background: rgb(248 250 252);
-  color: rgb(71 85 105);
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-regular);
   font-weight: 500;
 }
 
 .svid-virtual-table :deep(.el-table-v2__row-cell) {
-  background: rgb(255 255 255);
+  background: var(--el-bg-color);
 }
 
 .svid-virtual-table :deep(.el-table-v2__row:hover .el-table-v2__row-cell) {
-  background: rgb(248 250 252);
+  background: var(--el-fill-color-light);
 }
 
 .table-cell,

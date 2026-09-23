@@ -110,19 +110,19 @@
 
     <div
       v-if="messageBlockContextMenu.visible"
-      class="log-block-context-menu"
+      class="log-block-context-menu secs-context-menu"
       :style="{ left: messageBlockContextMenu.left + 'px', top: messageBlockContextMenu.top + 'px' }"
       role="menu"
       aria-label="消息块操作"
       @click.stop
       @contextmenu.prevent.stop
     >
-      <div class="log-block-context-menu__header">
+      <div class="log-block-context-menu__header secs-context-menu__header">
         <span>行 {{ messageBlockContextMenu.block?.startLine }}-{{ messageBlockContextMenu.block?.endLine }}</span>
         <strong>消息块操作</strong>
       </div>
       <button
-        class="log-block-context-menu__item"
+        class="log-block-context-menu__item secs-context-menu__item"
         type="button"
         role="menuitem"
         :disabled="!messageBlockContextMenu.selectedText"
@@ -130,34 +130,34 @@
       >
         <el-icon><CopyDocument /></el-icon><span>复制选中内容</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="copyContextMenuMessageBlock">
+      <button class="log-block-context-menu__item secs-context-menu__item" type="button" role="menuitem" @click="copyContextMenuMessageBlock">
         <el-icon><DocumentCopy /></el-icon><span>复制消息块</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="copyContextMenuFormattedMessageBlock">
+      <button class="log-block-context-menu__item secs-context-menu__item" type="button" role="menuitem" @click="copyContextMenuFormattedMessageBlock">
         <el-icon><DocumentCopy /></el-icon><span>复制格式化消息块</span>
       </button>
-      <div class="log-block-context-menu__separator"></div>
-      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="sendContextMenuMessageBlockToSecsSmlFormatter">
+      <div class="log-block-context-menu__separator secs-context-menu__separator"></div>
+      <button class="log-block-context-menu__item secs-context-menu__item" type="button" role="menuitem" @click="sendContextMenuMessageBlockToSecsSmlFormatter">
         <el-icon><DocumentCopy /></el-icon><span>发送至SML格式化</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="sendContextMenuMessageBlockToSmlBuilder">
+      <button class="log-block-context-menu__item secs-context-menu__item" type="button" role="menuitem" @click="sendContextMenuMessageBlockToSmlBuilder">
         <el-icon><SetUp /></el-icon><span>发送至SML构造器</span>
       </button>
-      <div class="log-block-context-menu__separator"></div>
-      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="markContextMenuBlockAsRangeStart">
+      <div class="log-block-context-menu__separator secs-context-menu__separator"></div>
+      <button class="log-block-context-menu__item secs-context-menu__item" type="button" role="menuitem" @click="markContextMenuBlockAsRangeStart">
         <el-icon><Top /></el-icon><span>标记区间起始点</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="markContextMenuBlockAsRangeEnd">
+      <button class="log-block-context-menu__item secs-context-menu__item" type="button" role="menuitem" @click="markContextMenuBlockAsRangeEnd">
         <el-icon><Bottom /></el-icon><span>标记区间结束点</span>
       </button>
-      <button class="log-block-context-menu__item log-block-context-menu__item--danger" type="button" role="menuitem" :disabled="!hasMarkedRangePoint" @click="clearRangeMarkers(true)">
+      <button class="log-block-context-menu__item log-block-context-menu__item--danger secs-context-menu__item secs-context-menu__item--danger" type="button" role="menuitem" :disabled="!hasMarkedRangePoint" @click="clearRangeMarkers(true)">
         <el-icon><Delete /></el-icon><span>清除区间标记</span>
       </button>
-      <div class="log-block-context-menu__separator"></div>
-      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="recordContextMenuMessageBlockToDiff('left')">
+      <div class="log-block-context-menu__separator secs-context-menu__separator"></div>
+      <button class="log-block-context-menu__item secs-context-menu__item" type="button" role="menuitem" @click="recordContextMenuMessageBlockToDiff('left')">
         <el-icon><DArrowLeft /></el-icon><span>记录至Diff-L</span>
       </button>
-      <button class="log-block-context-menu__item" type="button" role="menuitem" @click="recordContextMenuMessageBlockToDiff('right')">
+      <button class="log-block-context-menu__item secs-context-menu__item" type="button" role="menuitem" @click="recordContextMenuMessageBlockToDiff('right')">
         <el-icon><DArrowRight /></el-icon><span>记录至Diff-R</span>
       </button>
     </div>
@@ -512,7 +512,7 @@ const sxfyColorMaps = computed(() => {
 
 const getMarkerColor = (id: string, type: TimelineItem['type'] = 'CEID', ruleId?: string) => {
   if (type === 'RangeMarker') {
-    return '#64748b'
+    return 'var(--el-text-color-secondary)'
   }
 
   if (type === 'SxFy') {
@@ -1769,19 +1769,26 @@ const baseTheme = EditorView.theme({
     fontSize: '12px'
   },
   ".cm-log-hover-block": {
-    backgroundColor: 'rgba(14, 165, 233, 0.12) !important',
-    boxShadow: 'inset 3px 0 0 #0ea5e9'
+    backgroundColor: 'var(--el-color-primary-light-9) !important',
+    boxShadow: 'inset 3px 0 0 var(--el-color-primary)'
+  },
+  ".cm-selectionLayer": {
+    zIndex: '100 !important',
+    pointerEvents: 'none'
+  },
+  "&.cm-focused .cm-selectionBackground": {
+    backgroundColor: 'color-mix(in srgb, var(--el-color-primary) 42%, transparent) !important'
   },
   ".cm-log-flash-block": {
     animation: 'log-message-block-flash 0.55s ease-in-out 3'
   },
   "@keyframes log-message-block-flash": {
     "0%, 100%": {
-      backgroundColor: 'rgba(14, 165, 233, 0.10)'
+      backgroundColor: 'var(--el-color-primary-light-9)'
     },
     "50%": {
-      backgroundColor: 'rgba(14, 165, 233, 0.34)',
-      boxShadow: 'inset 3px 0 0 #0284c7'
+      backgroundColor: 'var(--el-color-primary-light-8)',
+      boxShadow: 'inset 3px 0 0 var(--el-color-primary-dark-2)'
     }
   },
   ".cm-log-range-start": {
@@ -2209,13 +2216,13 @@ const flashMessageBlockByLine = (lineNumber: number) => {
   background-color: transparent;
 }
 :deep(.cm-scroller::-webkit-scrollbar-thumb) {
-  background-color: rgba(100, 116, 139, 0.8);
+  background-color: var(--el-text-color-placeholder);
   border: 4px solid transparent;
   background-clip: padding-box;
   border-radius: 9999px;
 }
 :deep(.cm-scroller::-webkit-scrollbar-thumb:hover) {
-  background-color: rgba(71, 85, 105, 1);
+  background-color: var(--el-text-color-secondary);
 }
 :deep(.cm-scroller::-webkit-scrollbar-corner) {
   background-color: transparent;
@@ -2228,18 +2235,18 @@ const flashMessageBlockByLine = (lineNumber: number) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed #0ea5e9;
+  border: 2px dashed var(--el-color-primary);
   border-radius: 10px;
-  background: rgba(240, 249, 255, 0.78);
+  background: color-mix(in srgb, var(--el-color-primary-light-9) 78%, transparent);
   pointer-events: none;
 }
 
 .log-drop-overlay__panel {
   padding: 14px 18px;
-  border: 1px solid #bae6fd;
+  border: 1px solid var(--el-color-primary-light-5);
   border-radius: 8px;
-  background: #ffffff;
-  color: #0369a1;
+  background: var(--el-bg-color);
+  color: var(--el-color-primary);
   font-size: 14px;
   font-weight: 600;
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
@@ -2256,80 +2263,4 @@ const flashMessageBlockByLine = (lineNumber: number) => {
   box-shadow: 0 16px 36px rgba(15, 23, 42, 0.24), 0 4px 10px rgba(37, 99, 235, 0.28);
 }
 
-.log-block-context-menu {
-  position: fixed;
-  z-index: 3000;
-  width: 216px;
-  padding: 5px;
-  border: 1px solid #d4dee8;
-  border-radius: 7px;
-  background: #ffffff;
-  box-shadow: 0 12px 30px rgb(15 23 42 / 0.17), 0 2px 6px rgb(15 23 42 / 0.08);
-  color: #334155;
-}
-
-.log-block-context-menu__header {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 7px 7px;
-  border-bottom: 1px solid #edf1f5;
-}
-
-.log-block-context-menu__header span {
-  flex: 0 0 auto;
-  color: #8290a2;
-  font: 8px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-}
-
-.log-block-context-menu__header strong {
-  min-width: 0;
-  overflow: hidden;
-  color: #465569;
-  font-size: 10px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.log-block-context-menu__item {
-  display: grid;
-  grid-template-columns: 20px 1fr;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  height: 29px;
-  padding: 0 7px;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: #465569;
-  font-size: 10px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.log-block-context-menu__item:hover,
-.log-block-context-menu__item:focus-visible {
-  background: #edf7f7;
-  color: #096f78;
-  outline: none;
-}
-
-.log-block-context-menu__item .el-icon { font-size: 13px; }
-
-.log-block-context-menu__item:disabled {
-  color: #b6c0cc;
-  cursor: not-allowed;
-}
-
-.log-block-context-menu__item:disabled:hover,
-.log-block-context-menu__item:disabled:focus-visible {
-  background: transparent;
-  color: #b6c0cc;
-}
-
-.log-block-context-menu__item--danger { color: #b23842; }
-.log-block-context-menu__item--danger:hover:not(:disabled) { background: #fff1f2; color: #b4232d; }
-.log-block-context-menu__separator { height: 1px; margin: 4px 5px; background: #edf1f5; }
 </style>

@@ -1,32 +1,32 @@
 ﻿<template>
   <div class="h-full flex flex-col gap-4">
     <!-- Header Controls -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 flex-none">
+    <div class="bg-surface rounded-xl border border-border shadow-sm p-4 flex-none">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div class="flex items-center gap-2">
-          <div class="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
-            <el-icon class="text-purple-500 text-xl"><Switch /></el-icon>
+          <div class="p-2 bg-primary-soft rounded-lg">
+            <el-icon class="text-primary text-xl"><Switch /></el-icon>
           </div>
           <div>
-            <h2 class="text-lg font-semibold text-slate-800 dark:text-gray-100 m-0">ASCII / 十六进制 转换</h2>
-            <p class="text-xs text-slate-500 dark:text-gray-400 m-0 mt-0.5">支持大块文本和 Hex 数据的互相转换</p>
+            <h2 class="text-lg font-semibold text-fg m-0">ASCII / 十六进制 转换</h2>
+            <p class="text-xs text-fg-muted m-0 mt-0.5">支持大块文本和 Hex 数据的互相转换</p>
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded-lg border border-slate-100 dark:border-slate-700">
+        <div class="flex flex-wrap items-center gap-2 bg-fill-light p-1.5 rounded-lg border border-border-lighter">
           <el-button size="small" type="primary" class="!rounded-md shadow-sm" @click="handleTextToHex">
             文本 ➔ Hex
           </el-button>
           <el-button size="small" type="success" class="!rounded-md shadow-sm" @click="handleHexToText">
             Hex ➔ 文本
           </el-button>
-          <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+          <div class="w-px h-4 bg-border-strong mx-1"></div>
           <el-button size="small" type="danger" plain class="!rounded-md" @click="clearAll">清空</el-button>
         </div>
       </div>
       
       <!-- Options -->
-      <div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-slate-600 dark:text-slate-300">
+      <div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-fg-regular">
         <div class="flex items-center gap-2">
           <span>分隔符:</span>
           <el-select v-model="separator" size="small" style="width: 100px;">
@@ -62,9 +62,9 @@
     <!-- Main Content Grid -->
     <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
       <!-- Input Panel -->
-      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col h-full overflow-hidden">
-        <div class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 px-4 py-2 flex items-center justify-between shrink-0">
-          <span class="text-sm font-medium text-slate-600 dark:text-slate-300">输入区</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between shrink-0">
+          <span class="text-sm font-medium text-fg-regular">输入区</span>
         </div>
         <el-input
           v-model="sourceText"
@@ -76,9 +76,9 @@
       </div>
 
       <!-- Output Panel -->
-      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col h-full overflow-hidden">
-        <div class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 px-4 py-2 flex items-center justify-between shrink-0">
-          <span class="text-sm font-medium text-slate-600 dark:text-slate-300">处理结果</span>
+      <div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col h-full overflow-hidden">
+        <div class="bg-fill-light border-b border-border px-4 py-2 flex items-center justify-between shrink-0">
+          <span class="text-sm font-medium text-fg-regular">处理结果</span>
           <el-button size="small" plain @click="copyResult" title="一键复制结果" :disabled="!resultText">
             <el-icon class="mr-1"><DocumentCopy /></el-icon> 复制结果
           </el-button>

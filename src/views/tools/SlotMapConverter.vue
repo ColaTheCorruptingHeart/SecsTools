@@ -405,9 +405,9 @@ onMounted(syncTextsFromSelection)
 
 .slot-map-card,
 .output-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--el-border-color);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--el-bg-color);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
@@ -433,25 +433,25 @@ onMounted(syncTextsFromSelection)
 
 .slot-map-card h2 {
   margin: 0;
-  color: #1e293b;
+  color: var(--el-text-color-primary);
   font-size: 15px;
   font-weight: 600;
 }
 
 .slot-map-card p {
   margin: 3px 0 0;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
 }
 
 .mapping-fields {
   gap: 12px;
-  color: #475569;
+  color: var(--el-text-color-regular);
   font-size: 12px;
 }
 
 .mapping-fields__label {
-  color: #64748b;
+  color: var(--el-text-color-secondary);
 }
 
 .mapping-fields label {
@@ -463,24 +463,24 @@ onMounted(syncTextsFromSelection)
   width: 32px;
   height: 28px;
   padding: 0;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--el-border-color-darker);
   border-radius: 5px;
   outline: none;
-  color: #0f172a;
+  color: var(--el-text-color-primary);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-weight: 600;
   text-align: center;
 }
 
 .mapping-fields input:focus-visible {
-  border-color: #0891b2;
-  box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.12);
+  border-color: var(--el-color-primary);
+  box-shadow: 0 0 0 2px var(--el-color-primary-light-8);
 }
 
 .slot-map-card__actions {
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--el-border-color-lighter);
 }
 
 .slot-summary,
@@ -490,7 +490,7 @@ onMounted(syncTextsFromSelection)
 
 .slot-summary {
   min-width: 0;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
 }
 
@@ -515,7 +515,7 @@ onMounted(syncTextsFromSelection)
 .slot-button {
   width: 38px;
   height: 36px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--el-border-color-darker);
   border-radius: 6px;
   font-size: 13px;
   line-height: 1;
@@ -523,19 +523,19 @@ onMounted(syncTextsFromSelection)
 }
 
 .slot-button--inactive {
-  background: #ffffff;
-  color: #64748b;
+  background: var(--el-bg-color);
+  color: var(--el-text-color-secondary);
 }
 
 .slot-button--inactive:hover {
-  border-color: #0891b2;
-  color: #0e7490;
+  border-color: var(--el-color-primary);
+  color: var(--el-color-primary);
 }
 
 .slot-button--active {
-  border-color: #0891b2;
-  background: #0891b2;
-  color: #ffffff;
+  border-color: var(--el-color-primary);
+  background: var(--el-color-primary);
+  color: var(--el-color-white);
 }
 
 .outputs-grid {
@@ -565,9 +565,9 @@ onMounted(syncTextsFromSelection)
   justify-content: space-between;
   gap: 10px;
   padding: 7px 10px 7px 12px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
-  color: #475569;
+  border-bottom: 1px solid var(--el-border-color);
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-regular);
   font-size: 13px;
   font-weight: 600;
 }
@@ -580,7 +580,7 @@ onMounted(syncTextsFromSelection)
 }
 
 .output-card header small {
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 10px;
   font-weight: 400;
@@ -625,7 +625,7 @@ onMounted(syncTextsFromSelection)
 
 .list-card__body p {
   margin: 0;
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
   font-size: 11px;
   line-height: 16px;
 }

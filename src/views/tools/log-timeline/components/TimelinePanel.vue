@@ -1,6 +1,6 @@
 ﻿<template>
-  <div class="lg:w-72 xl:w-80 shrink-0 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col overflow-hidden h-72 lg:h-full">
-    <div class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 font-medium text-sm flex flex-col text-slate-600 dark:text-slate-300 shrink-0">
+  <div class="lg:w-72 xl:w-80 shrink-0 bg-surface rounded-xl border border-border shadow-sm flex flex-col overflow-hidden h-72 lg:h-full">
+    <div class="bg-fill-light border-b border-border font-medium text-sm flex flex-col text-fg-regular shrink-0">
       <div class="p-2 px-4 flex justify-between items-center">
         <span>时间线</span>
         <el-tag size="small" type="info" round>找到 {{ items.length }} 条记录</el-tag>
@@ -32,7 +32,7 @@
             data-testid="timeline-item"
             :data-range-markers="virtualItem.item.rangeMarkers?.join(',') || undefined"
             :data-timeline-item-type="virtualItem.item.type || 'CEID'"
-            class="h-17 cursor-pointer border-l-[3px] p-2 rounded-r transition-colors group flex flex-col gap-1 hover:bg-slate-50 dark:hover:bg-slate-700/50"
+            class="h-17 cursor-pointer border-l-[3px] p-2 rounded-r transition-colors group flex flex-col gap-1 hover:bg-fill-light"
             :class="{
               'timeline-item--flashing': getItemKey(virtualItem.item) === flashingItemKey,
               'timeline-item--range-start': hasRangeMarker(virtualItem.item, 'start'),
@@ -45,7 +45,7 @@
             @contextmenu.prevent.stop="openTimelineContextMenu(virtualItem.item, $event)"
           >
             <div class="flex justify-between items-center gap-2">
-              <span class="text-[11px] text-slate-600 font-mono tracking-tight shrink-0">{{ virtualItem.item.time }}</span>
+              <span class="text-[11px] text-fg-regular font-mono tracking-tight shrink-0">{{ virtualItem.item.time }}</span>
               <div class="flex items-center gap-2 min-w-0">
                 <span
                   v-for="marker in virtualItem.item.rangeMarkers"
@@ -70,9 +70,9 @@
                 />
               </div>
             </div>
-            <div class="timeline-item-desc text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:opacity-80 leading-tight">
+            <div class="timeline-item-desc text-sm font-medium text-fg-regular group-hover:opacity-80 leading-tight">
               {{ virtualItem.item.desc }}
-              <span v-if="isRangeMarker(virtualItem.item) && virtualItem.item.sxFy" class="ml-1 font-mono text-xs text-slate-500 dark:text-slate-400">
+              <span v-if="isRangeMarker(virtualItem.item) && virtualItem.item.sxFy" class="ml-1 font-mono text-xs text-fg-muted">
                 {{ virtualItem.item.sxFy }}
               </span>
             </div>
@@ -82,7 +82,7 @@
       <el-empty v-else description="暂无符合规则的数据" :image-size="60" />
     </div>
 
-    <div class="p-2 border-t border-slate-200 dark:border-slate-700 flex-none flex flex-col gap-2 bg-slate-50 dark:bg-slate-900/50">
+    <div class="p-2 border-t border-border flex-none flex flex-col gap-2 bg-fill-light">
       <div class="flex items-center gap-4 flex-wrap">
         <el-checkbox v-model="exportKeepTimeLineModel" size="small">保留时间行</el-checkbox>
         <el-checkbox v-model="exportSelectedOnlyModel" size="small">只导出已勾选报文</el-checkbox>
@@ -101,22 +101,24 @@
 
     <div
       v-if="timelineContextMenu.visible"
-      class="timeline-context-menu"
+      class="timeline-context-menu secs-context-menu"
       :style="{ left: timelineContextMenu.left + 'px', top: timelineContextMenu.top + 'px' }"
+      role="menu"
+      aria-label="时间线选择操作"
       @click.stop
       @contextmenu.prevent.stop
     >
-      <button class="timeline-context-menu__item" type="button" :disabled="!selectableItems.length" @click="handleContextMenuAction('selectAll')">
-        全选
+      <button class="timeline-context-menu__item secs-context-menu__item" type="button" role="menuitem" :disabled="!selectableItems.length" @click="handleContextMenuAction('selectAll')">
+        <el-icon><CircleCheck /></el-icon><span>全选</span>
       </button>
-      <button class="timeline-context-menu__item" type="button" :disabled="!selectableItems.length" @click="handleContextMenuAction('clearAll')">
-        取消全选
+      <button class="timeline-context-menu__item secs-context-menu__item" type="button" role="menuitem" :disabled="!selectableItems.length" @click="handleContextMenuAction('clearAll')">
+        <el-icon><CircleClose /></el-icon><span>取消全选</span>
       </button>
-      <button class="timeline-context-menu__item" type="button" :disabled="!isSelectableContextItem || !timelineContextMenu.item?.sxFy" @click="handleContextMenuAction('selectSameSxFy')">
-        选择同SxFy
+      <button class="timeline-context-menu__item secs-context-menu__item" type="button" role="menuitem" :disabled="!isSelectableContextItem || !timelineContextMenu.item?.sxFy" @click="handleContextMenuAction('selectSameSxFy')">
+        <el-icon><Connection /></el-icon><span>选择同SxFy</span>
       </button>
-      <button class="timeline-context-menu__item" type="button" :disabled="!isSelectableContextItem || !timelineContextMenu.item?.ceid" @click="handleContextMenuAction('selectSameCeid')">
-        选择同CEID
+      <button class="timeline-context-menu__item secs-context-menu__item" type="button" role="menuitem" :disabled="!isSelectableContextItem || !timelineContextMenu.item?.ceid" @click="handleContextMenuAction('selectSameCeid')">
+        <el-icon><PriceTag /></el-icon><span>选择同CEID</span>
       </button>
     </div>
   </div>
@@ -124,7 +126,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Download } from '@element-plus/icons-vue'
+import { CircleCheck, CircleClose, Connection, Download, PriceTag } from '@element-plus/icons-vue'
 import type { RangeMarkerKind, TimelineItem } from '../types'
 
 const ITEM_HEIGHT = 76
@@ -247,7 +249,7 @@ const handleItemCheckedChange = (item: TimelineItem, checked: boolean) => {
 }
 
 const getContextMenuPosition = (event: MouseEvent) => {
-  const menuWidth = 136
+  const menuWidth = 216
   const menuHeight = 148
   const margin = 8
 
@@ -431,8 +433,8 @@ const exportSelectedOnlyModel = computed({
 
 .timeline-item--range-marker {
   cursor: pointer;
-  border-top: 1px dashed #cbd5e1;
-  border-bottom: 1px dashed #cbd5e1;
+  border-top: 1px dashed var(--el-border-color-darker);
+  border-bottom: 1px dashed var(--el-border-color-darker);
 }
 
 .timeline-range-badge {
@@ -485,50 +487,8 @@ const exportSelectedOnlyModel = computed({
   }
 
   50% {
-    background-color: #dbeafe;
+    background-color: var(--el-color-primary-light-8);
   }
 }
 
-.timeline-context-menu {
-  position: fixed;
-  z-index: 3000;
-  min-width: 128px;
-  padding: 4px;
-  border: 1px solid #dbe3ef;
-  border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
-}
-
-.timeline-context-menu__item {
-  display: block;
-  width: 100%;
-  padding: 7px 10px;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: #334155;
-  font-size: 13px;
-  line-height: 18px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.timeline-context-menu__item:hover,
-.timeline-context-menu__item:focus-visible {
-  background: #eef6ff;
-  color: #0369a1;
-  outline: none;
-}
-
-.timeline-context-menu__item:disabled {
-  color: #94a3b8;
-  cursor: not-allowed;
-}
-
-.timeline-context-menu__item:disabled:hover,
-.timeline-context-menu__item:disabled:focus-visible {
-  background: transparent;
-  color: #94a3b8;
-}
 </style>

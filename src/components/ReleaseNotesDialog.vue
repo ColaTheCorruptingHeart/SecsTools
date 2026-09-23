@@ -9,33 +9,33 @@
   >
     <template #header>
       <div class="flex min-w-0 items-start gap-3 pr-6">
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
           <el-icon :size="21"><Bell /></el-icon>
         </div>
         <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-2">
-            <h2 class="m-0 text-lg font-semibold text-slate-900">{{ latestRelease.title }}</h2>
-            <span class="rounded-full bg-blue-50 px-2 py-0.5 font-mono text-xs font-semibold text-blue-700">
+            <h2 class="m-0 text-lg font-semibold text-fg">{{ latestRelease.title }}</h2>
+            <span class="rounded-full bg-primary-soft px-2 py-0.5 font-mono text-xs font-semibold text-primary">
               v{{ latestRelease.version }}
             </span>
           </div>
-          <p class="mt-1 mb-0 text-xs text-slate-500">发布于 {{ latestRelease.date }}</p>
+          <p class="mt-1 mb-0 text-xs text-fg-muted">发布于 {{ latestRelease.date }}</p>
         </div>
       </div>
     </template>
 
-    <p class="mt-0 mb-5 text-sm leading-6 text-slate-600">{{ latestRelease.summary }}</p>
+    <p class="mt-0 mb-5 text-sm leading-6 text-fg-regular">{{ latestRelease.summary }}</p>
 
     <div class="space-y-4">
       <section v-for="section in latestRelease.sections" :key="section.title">
-        <h3 class="mt-0 mb-2 text-sm font-semibold text-slate-800">{{ section.title }}</h3>
+        <h3 class="mt-0 mb-2 text-sm font-semibold text-fg">{{ section.title }}</h3>
         <ul class="m-0 space-y-2 pl-0">
           <li
             v-for="item in section.items"
             :key="item"
-            class="flex items-start gap-2 text-sm leading-6 text-slate-600"
+            class="flex items-start gap-2 text-sm leading-6 text-fg-regular"
           >
-            <el-icon class="mt-1 shrink-0 text-emerald-500" :size="16"><CircleCheckFilled /></el-icon>
+            <el-icon class="mt-1 shrink-0 text-success" :size="16"><CircleCheckFilled /></el-icon>
             <span>{{ item }}</span>
           </li>
         </ul>
@@ -95,7 +95,7 @@ defineExpose({ open })
 .release-notes-dialog .el-dialog__header {
   margin-right: 0;
   padding-bottom: 14px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 .release-notes-dialog .el-dialog__body {
