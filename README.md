@@ -21,14 +21,14 @@ SECS Tools 将常用的 SML 报文处理、SECS 日志分析、SVID 提取、Slo
 | 通用数据处理 | 进制转换 | 批量进行进制转换，并保留本地历史记录 |
 | 通用数据处理 | ASCII / Hex 转换 | 大块文本、ASCII 与十六进制数据互转 |
 | 通用数据处理 | 通用差异对比 | 左右并排比较文本，支持大文本按需渲染 |
-| SECS 报文 | SML 构造器 | 通过参数表和结构树创建 SML，自动维护 List 数量并实时校验 |
+| SECS 报文 | SML 构造器 | 通过参数表、结构树或 GEM 模板创建 SML，支持严格校验、长度标识和节点上下文操作 |
 | SECS 报文 | SECS SML 格式化 | 格式化原始报文，提供宽松/严格解析、诊断定位和层级路径点选 |
-| SECS 报文 | S1F12 SVID 提取 | 从 S1F12 中提取 SVID、SVNAME 和 UNITS |
+| SECS 报文 | S1F12 SVID 提取 | 从 S1F12 中提取 SVID、SVNAME 和 UNITS，支持备注编辑与结构化命名的 CSV 导出 |
 | SECS 报文 | S1F3 生成器 | 根据 SVID 列表生成指定数据格式的 S1F3 W 命令 |
 | SECS 报文 | S1F4 解析 | 将 S1F4 返回值与 SVNAME 映射顺序对齐展示 |
 | SECS 报文 | Slot 转换工具 | 在 25 槽位、数字映射、map、U1 List、反相结果和区间表达式之间转换 |
 | SECS 报文 | RecipeBody 分析器 | 统一分析 PPBODY、Hex、字节数组和文件输入，并支持无损导出 |
-| 日志分析 | SECS 日志时间线分析 | 提取关键事件并按时间线展示，支持 CEID 规则、范围标记、跳转和导出 |
+| 日志分析 | SECS 日志时间线分析 | 提取关键事件并按时间线展示，支持消息块操作、CEID 规则、范围标记、跳转及多种结构化导出 |
 | 日志分析 | SECS 日志语义差异 | 按消息块、字段路径与关键语义比较两份 SECS/SML 作业日志 |
 
 ## 快速开始
@@ -92,6 +92,8 @@ npx playwright install chromium
 - [CodeMirror 6](https://codemirror.net/)
 - [Vitest](https://vitest.dev/) + [Playwright](https://playwright.dev/)
 - [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)
+
+界面状态与交互色以 Element Plus 语义色为准，Tailwind CSS 主要负责布局和语义类映射。SML 数据类型、日志规则和差异标记保留独立的业务辨识色。
 
 ## 项目结构
 
