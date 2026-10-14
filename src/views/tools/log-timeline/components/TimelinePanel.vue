@@ -17,8 +17,12 @@
 
     <div
       ref="timelineViewportRef"
-      class="flex-1 overflow-auto p-4 custom-scrollbar"
+      class="timeline-viewport flex-1 overflow-auto py-4 pl-4 pr-1 custom-scrollbar"
+      tabindex="0"
+      role="listbox"
+      aria-label="SECS 日志时间线"
       @scroll="handleViewportScroll"
+      @keydown="handleTimelineKeydown"
       @contextmenu.prevent="openTimelineContextMenu(null, $event)"
     >
       <div v-if="items.length" :style="{ height: totalListHeight + 'px', position: 'relative' }">
@@ -32,20 +36,30 @@
             data-testid="timeline-item"
             :data-range-markers="virtualItem.item.rangeMarkers?.join(',') || undefined"
             :data-timeline-item-type="virtualItem.item.type || 'CEID'"
+            :aria-selected="getItemKey(virtualItem.item) === currentItemKey"
+            role="option"
             class="h-17 cursor-pointer border-l-[3px] p-2 rounded-r transition-colors group flex flex-col gap-1 hover:bg-fill-light"
             :class="{
+              'timeline-item--current': getItemKey(virtualItem.item) === currentItemKey,
               'timeline-item--flashing': getItemKey(virtualItem.item) === flashingItemKey,
               'timeline-item--range-start': hasRangeMarker(virtualItem.item, 'start'),
               'timeline-item--range-end': hasRangeMarker(virtualItem.item, 'end'),
               'timeline-item--range-marker': isRangeMarker(virtualItem.item)
             }"
             :style="{ borderLeftColor: getItemMarkerColor(virtualItem.item) }"
-            @click="emit('jump', virtualItem.item.line)"
+            @click="handleItemClick(virtualItem.item)"
             @dblclick="emit('flashMessageBlock', virtualItem.item.line)"
             @contextmenu.prevent.stop="openTimelineContextMenu(virtualItem.item, $event)"
           >
             <div class="flex justify-between items-center gap-2">
-              <span class="text-[11px] text-fg-regular font-mono tracking-tight shrink-0">{{ virtualItem.item.time }}</span>
+              <div class="flex items-center gap-1.5 min-w-0 font-mono tracking-tight shrink-0">
+                <span
+                  data-testid="timeline-item-sequence"
+                  class="text-[10px] text-fg-muted tabular-nums"
+                  :title="`序号 ${virtualItem.sequence}`"
+                >#{{ virtualItem.sequence }}</span>
+                <span class="text-[11px] text-fg-regular tabular-nums">{{ virtualItem.item.time }}</span>
+              </div>
               <div class="flex items-center gap-2 min-w-0">
                 <span
                   v-for="marker in virtualItem.item.rangeMarkers"
@@ -125,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { CircleCheck, CircleClose, Connection, Download, PriceTag } from '@element-plus/icons-vue'
 import type { RangeMarkerKind, TimelineItem } from '../types'
 
@@ -188,6 +202,7 @@ const getItemMarkerColor = (item: TimelineItem) => {
 const timelineViewportRef = ref<HTMLDivElement | null>(null)
 const viewportHeight = ref(0)
 const scrollTop = ref(0)
+const currentItemKey = ref('')
 const timelineContextMenu = ref<{
   visible: boolean
   left: number
@@ -222,6 +237,7 @@ const visibleItems = computed(() => {
     const absoluteIndex = start + index
     return {
       item,
+      sequence: absoluteIndex + 1,
       top: absoluteIndex * ITEM_HEIGHT
     }
   })
@@ -311,6 +327,106 @@ const handleViewportScroll = () => {
   closeTimelineContextMenu()
 }
 
+const revealItem = (itemIndex: number) => {
+  const viewport = timelineViewportRef.value
+  if (!viewport || itemIndex < 0) {
+    return
+  }
+
+  const itemTop = itemIndex * ITEM_HEIGHT
+  const itemBottom = itemTop + ITEM_HEIGHT
+  const viewportBottom = viewport.scrollTop + viewport.clientHeight
+  let nextScrollTop = viewport.scrollTop
+
+  if (itemTop < viewport.scrollTop) {
+    nextScrollTop = itemTop
+  } else if (itemBottom > viewportBottom) {
+    nextScrollTop = itemBottom - viewport.clientHeight
+  }
+
+  if (nextScrollTop !== viewport.scrollTop) {
+    viewport.scrollTop = nextScrollTop
+    scrollTop.value = nextScrollTop
+  }
+}
+
+const selectItemAtIndex = (itemIndex: number) => {
+  const item = props.items[itemIndex]
+  if (!item) {
+    return
+  }
+
+  currentItemKey.value = props.getItemKey(item)
+  revealItem(itemIndex)
+  emit('jump', item.line)
+}
+
+const handleItemClick = (item: TimelineItem) => {
+  currentItemKey.value = props.getItemKey(item)
+  timelineViewportRef.value?.focus({ preventScroll: true })
+  emit('jump', item.line)
+}
+
+const isSameNavigationGroup = (currentItem: TimelineItem, candidate: TimelineItem) => {
+  const currentType = currentItem.type || 'CEID'
+  const candidateType = candidate.type || 'CEID'
+
+  if (currentType !== candidateType) {
+    return false
+  }
+
+  if (currentType === 'CEID') {
+    return candidate.ceid === currentItem.ceid
+  }
+
+  if (currentType === 'SxFy') {
+    return candidate.sxFy === currentItem.sxFy
+  }
+
+  return false
+}
+
+const findDirectionalItemIndex = (startIndex: number, direction: -1 | 1, sameGroupOnly: boolean) => {
+  if (!sameGroupOnly) {
+    const nextIndex = startIndex + direction
+    return nextIndex >= 0 && nextIndex < props.items.length ? nextIndex : -1
+  }
+
+  const currentItem = props.items[startIndex]
+  if (!currentItem) {
+    return -1
+  }
+
+  for (let index = startIndex + direction; index >= 0 && index < props.items.length; index += direction) {
+    const candidate = props.items[index]
+    if (candidate && isSameNavigationGroup(currentItem, candidate)) {
+      return index
+    }
+  }
+
+  return -1
+}
+
+const handleTimelineKeydown = (event: KeyboardEvent) => {
+  if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
+    return
+  }
+
+  event.preventDefault()
+  const direction: -1 | 1 = event.key === 'ArrowUp' ? -1 : 1
+  const currentIndex = props.items.findIndex(item => props.getItemKey(item) === currentItemKey.value)
+
+  if (currentIndex < 0) {
+    selectItemAtIndex(direction === 1 ? 0 : props.items.length - 1)
+    return
+  }
+
+  const targetIndex = findDirectionalItemIndex(currentIndex, direction, event.ctrlKey)
+  if (targetIndex >= 0) {
+    selectItemAtIndex(targetIndex)
+  }
+}
+
 const centerAndFlashItem = (key: string) => {
   const itemIndex = props.items.findIndex(item => props.getItemKey(item) === key)
   if (itemIndex < 0 || !timelineViewportRef.value) {
@@ -318,6 +434,7 @@ const centerAndFlashItem = (key: string) => {
   }
 
   const nextScrollTop = Math.max(0, itemIndex * ITEM_HEIGHT - Math.max(0, viewportHeight.value - ITEM_HEIGHT) / 2)
+  currentItemKey.value = key
   timelineViewportRef.value.scrollTop = nextScrollTop
   scrollTop.value = nextScrollTop
 
@@ -337,6 +454,12 @@ const centerAndFlashItem = (key: string) => {
     }, 1800)
   })
 }
+
+watch(() => props.items, (items) => {
+  if (currentItemKey.value && !items.some(item => props.getItemKey(item) === currentItemKey.value)) {
+    currentItemKey.value = ''
+  }
+})
 
 const handleDocumentClick = () => {
   closeTimelineContextMenu()
@@ -412,6 +535,21 @@ const exportSelectedOnlyModel = computed({
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.timeline-viewport {
+  outline: none;
+}
+
+.timeline-viewport:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--el-color-primary-light-7);
+}
+
+.timeline-item--current {
+  z-index: 1;
+  outline: 2px solid var(--el-color-primary);
+  outline-offset: -2px;
+  background-color: var(--el-color-primary-light-9);
 }
 
 .timeline-item--flashing {
