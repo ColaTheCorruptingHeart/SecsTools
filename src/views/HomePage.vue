@@ -1,6 +1,6 @@
 ﻿<template>
-  <div class="h-full flex px-2 py-4">
-    <div class="flex-1 overflow-y-auto px-1 custom-scrollbar">
+  <div data-testid="home-page" class="px-2 py-4">
+    <div class="px-1">
 
       <div class="mb-8" v-if="favoriteTools.length > 0">
         <h2 class="text-xl font-bold text-fg tracking-tight flex items-center gap-2 mb-4">
@@ -93,21 +93,6 @@ const goToTool = (path: string) => {
 </script>
 
 <style scoped>
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--el-border-color-darker);
-  border-radius: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--el-text-color-placeholder);
-}
-
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
