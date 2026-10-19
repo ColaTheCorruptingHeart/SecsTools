@@ -359,12 +359,11 @@ function buildNode(context: ParserContext, start: number, depth = 0): { node: Se
   const boundary = scanTagBoundary(input, start)
   let openingTagEnd = boundary.tagEnd
   let childStart = boundary.childStart
-  const lineBodyEnd = boundary.newlineIndex === -1 ? input.length : boundary.newlineIndex
-  const lineBody = input.slice(start + 1, lineBodyEnd)
-  const lineHeader = normalizeBody(lineBody)
-  const hasMultilineListHeader = boundary.newlineIndex !== -1
-    && isListType(lineHeader.typeName)
-    && !lineHeader.value
+  let hasMultilineListHeader = false
+  if (boundary.newlineIndex !== -1) {
+    const lineHeader = normalizeBody(input.slice(start + 1, boundary.newlineIndex))
+    hasMultilineListHeader = isListType(lineHeader.typeName) && !lineHeader.value
+  }
   if (hasMultilineListHeader) {
     openingTagEnd = -1
     childStart = boundary.newlineIndex + 1
