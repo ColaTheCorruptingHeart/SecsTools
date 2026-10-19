@@ -84,15 +84,12 @@ export function analyzeLogTimelineDetailed(
     }
     if (!sfName) return
     const activeSxFyRules = sxfyRuleMap.get(sfName) || []
-    const valueSxFyRules = activeSxFyRules.filter(
-      (rule): rule is SxFyRuleItem & { keyPos: string } => Boolean(rule.keyPos)
-    )
     activeSxFyRules.forEach(rule => {
       if (!rule.keyPos) {
         timeline.push({ time, sxFy: sfName, ceid: sfName, ruleId: rule.id, type: 'SxFy', desc: rule.desc || `匹配到 ${sfName} 消息`, line: block.contentStartLine })
       }
     })
-    if (!valueSxFyRules.length && sfName !== ceidMatchSxFy) return
+    if (!activeSxFyRules.length && sfName !== ceidMatchSxFy) return
     const parsed = parseSmlTree(rawLines.join('\n'))
     parsed.diagnostics.forEach(diagnostic => {
       diagnostics.push({
@@ -111,7 +108,8 @@ export function analyzeLogTimelineDetailed(
     if (ceidValue && ruleMap.has(ceidValue)) {
       timeline.push({ time, sxFy: sfName, ceid: ceidValue, type: 'CEID', desc: ruleMap.get(ceidValue) || '', line: block.startLine + (ceidNode?.sourceRange?.startLine || 1) - 1 })
     }
-    valueSxFyRules.forEach(rule => {
+    activeSxFyRules.forEach(rule => {
+      if (!rule.keyPos) return
       const path = Array.from(rule.keyPos.matchAll(/\[(\d+)\]/g)).map(match => Number(match[1]))
       const node = getNodeAtPath(parsed.roots, path)
       if (!node) return

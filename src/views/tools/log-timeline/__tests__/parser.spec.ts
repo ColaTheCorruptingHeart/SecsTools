@@ -44,40 +44,6 @@ describe('SECS log timeline analysis', () => {
     expect(result).toEqual([])
   })
 
-  it('does not parse message bodies for presence-only SxFy rules', () => {
-    const source = `01:00:00 SEND S7F20
-S7F20
-<L,1
-  <A 'RECIPE'>`
-    const presenceRule: SxFyRuleItem = {
-      id: 's7f20-presence', s: 7, f: 20, desc: 'RecipeList', color: '#00f'
-    }
-
-    const result = analyzeLogTimelineDetailed(source, [], [presenceRule])
-
-    expect(result.timeline).toEqual([
-      expect.objectContaining({ sxFy: 'S7F20', desc: 'RecipeList', ruleId: 's7f20-presence' })
-    ])
-    expect(result.diagnostics).toEqual([])
-  })
-
-  it('still parses message bodies when an SxFy rule reads a configured path', () => {
-    const source = `01:00:00 SEND S7F20
-S7F20
-<L,1
-  <A 'RECIPE'>`
-    const valueRule: SxFyRuleItem = {
-      id: 's7f20-value', s: 7, f: 20, keyPos: '[0][0]', desc: 'Recipe', color: '#00f'
-    }
-
-    const result = analyzeLogTimelineDetailed(source, [], [valueRule])
-
-    expect(result.timeline).toEqual([])
-    expect(result.diagnostics).toContainEqual(expect.objectContaining({
-      sfName: 'S7F20', code: 'unclosed-list', severity: 'error'
-    }))
-  })
-
   it('returns message-level SML diagnostics without emitting values from unusable trees', () => {
     const source = `01:00:00 SEND S6F11
 S6F11

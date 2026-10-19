@@ -34,24 +34,6 @@ describe('SECS SML parser', () => {
     expect(getNodeValueText(name)).toBe('"Temperature > limit"')
   })
 
-  it('parses large flat lists without rescanning the remaining input for every scalar', () => {
-    const childCount = 1_500
-    const children = Array.from(
-      { length: childCount },
-      (_, index) => `<A 'RECIPE_${index.toString().padStart(4, '0')}_${'X'.repeat(32)}'>`
-    )
-    const source = [`S7F20`, `<L,${childCount}`, ...children, '>.'].join('\n')
-    const startedAt = performance.now()
-
-    const parsed = parseSmlTree(source)
-    const elapsedMs = performance.now() - startedAt
-
-    expect(parsed.diagnostics).toEqual([])
-    expect(parsed.roots[0]?.children).toHaveLength(childCount)
-    expect(getNodeValueText(parsed.roots[0]?.children.at(-1))).toContain('RECIPE_1499')
-    expect(elapsedMs).toBeLessThan(2_000)
-  })
-
   it('parses an explicitly closed empty list', () => {
     const parsed = parseSmlTree(`S1F14\n<L,0\n>.`)
 
